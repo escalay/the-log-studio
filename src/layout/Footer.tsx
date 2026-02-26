@@ -104,11 +104,11 @@ export const Footer = () => {
           <div className="p-8 border-b md:border-b-0 md:border-r border-white/20 font-mono text-xs space-y-2">
             <div className="flex justify-between">
               <span className="text-white/50">AUTHOR</span>
-              <span>THE FOUNDER</span>
+              <a href="https://abdallahaho.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">ABDALLAH OTHMAN</a>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">LOC</span>
-              <span>SAN FRANCISCO</span>
+              <span>HAMBURG, DE</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">LIC</span>
@@ -150,7 +150,9 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-white/20 p-2 text-center font-mono text-[9px] text-white/30 uppercase tracking-[0.2em]">
-          &copy; 2025 Escalay Systems Inc. All Rights Reserved. No Refunds.
+          &copy; {new Date().getFullYear()}{' '}
+          <a href="https://abdallahaho.com" target="_blank" rel="noopener noreferrer" className="hover:text-white/60 transition-colors">Abdallah Othman</a>
+          {' '}&mdash; Hamburg, DE. No Refunds.
         </div>
       </div>
     </footer>
