@@ -2,6 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
-Disallow: /og/
 
 Sitemap: https://escalay.space/sitemap-index.xml

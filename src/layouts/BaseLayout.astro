@@ -6,6 +6,7 @@ interface Props {
   description?: string
   noindex?: boolean
   ogImage?: string
+  ogType?: 'website' | 'article'
   jsonLd?: Record<string, unknown>
 }
 
@@ -14,13 +15,15 @@ const {
   description = 'The operating system for ideas. A brutalist digital garden tracking the evolution of experiments from raw notes to shipped products.',
   noindex = false,
   ogImage,
+  ogType = 'website',
   jsonLd,
 } = Astro.props
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
+const siteOrigin = Astro.site ?? Astro.url.origin
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin)
 const ogImageURL = ogImage
-  ? new URL(ogImage, Astro.site ?? Astro.url.origin).href
-  : new URL('/og/default.png', Astro.site ?? Astro.url.origin).href
+  ? new URL(ogImage, siteOrigin).href
+  : new URL('/og/default.png', siteOrigin).href
 ---
 
 <!DOCTYPE html>
@@ -30,24 +33,35 @@ const ogImageURL = ogImage
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content="Abdallah Othman" />
     <meta name="theme-color" content="#FF4F00" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonicalURL.href} />
+
+    <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonicalURL.href} />
     <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:alt" content={title} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:site_name" content="Escalay" />
+    <meta property="og:site_name" content="The Log Studio" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
+    <meta name="twitter:image:alt" content={title} />
+
     {jsonLd && (
       <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     )}
+
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔶</text></svg>"
