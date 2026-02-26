@@ -106,10 +106,32 @@ export const CollectionApp = () => {
             </div>
           ))}
 
-          {filteredEntries.length === 0 && (
-            <div className="col-span-full py-32 flex flex-col items-center justify-center border-b border-ink">
+          {filteredEntries.length === 0 && entries.length === 0 && (
+            <div className="col-span-full py-32 flex flex-col items-center justify-center">
+              <div className="w-24 h-24 border-2 border-dashed border-ink/20 rounded-full flex items-center justify-center mb-8">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-ink/20">
+                  <path d="M12 3v3m6.36-.64-2.12 2.12M21 12h-3M18.36 18.36l-2.12-2.12M12 21v-3M5.64 18.36l2.12-2.12M3 12h3M5.64 5.64l2.12 2.12" />
+                </svg>
+              </div>
+              <p className="font-serif text-3xl italic text-ink/60 mb-3">The studio is empty</p>
+              <p className="font-mono text-xs text-ink/30 uppercase tracking-widest mb-8 text-center max-w-md leading-relaxed">
+                This is where ideas become experiments, projects, and products.
+                <br />
+                Create your first entry from the admin panel.
+              </p>
+              <a
+                href="/admin"
+                className="px-6 py-3 bg-ink text-white font-mono text-xs font-bold uppercase tracking-widest hover:bg-accent transition-colors"
+              >
+                Open Admin Panel →
+              </a>
+            </div>
+          )}
+
+          {filteredEntries.length === 0 && entries.length > 0 && (
+            <div className="col-span-full py-32 flex flex-col items-center justify-center">
               <div className="w-16 h-16 border-2 border-dashed border-subtle rounded-full flex items-center justify-center mb-4">?</div>
-              <p className="font-serif text-2xl italic">No signals found.</p>
+              <p className="font-serif text-2xl italic">No signals match this filter.</p>
               <button onClick={() => setFilter({ level: 'all', tag: null })} className="mt-4 font-mono text-xs underline hover:text-accent">
                 RESET FILTER
               </button>

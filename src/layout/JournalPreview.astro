@@ -144,19 +144,21 @@ const others = posts.slice(1, 4)
     </div>
   </section>
 ) : (
-  <!-- Empty state: no journal posts yet -->
   <section class="border-t-4 border-ink bg-level-0 relative overflow-hidden">
+    <div class="absolute inset-0 bg-dot-grid opacity-20 pointer-events-none"></div>
     <div class="container mx-auto max-w-7xl border-x border-ink">
       <div class="border-b border-ink p-6 md:p-8 flex items-center gap-4">
         <div class="w-4 h-4 bg-ink/20"></div>
         <h2 class="font-serif text-3xl md:text-5xl italic text-subtle">From The Register</h2>
       </div>
-      <div class="py-24 flex flex-col items-center justify-center text-center">
-        <div class="w-20 h-20 border-2 border-dashed border-subtle rounded-full flex items-center justify-center mb-6">
-          <JournalIcon className="w-8 h-8 text-subtle" />
+      <div class="py-24 flex flex-col items-center justify-center text-center px-6">
+        <div class="w-20 h-20 border-2 border-dashed border-ink/15 rounded-full flex items-center justify-center mb-8">
+          <JournalIcon className="w-8 h-8 text-ink/20" />
         </div>
-        <p class="font-serif text-2xl italic text-subtle mb-2">No dispatches yet</p>
-        <p class="font-mono text-xs text-subtle/60 uppercase tracking-widest">The register is being prepared</p>
+        <p class="font-serif text-3xl italic text-ink/40 mb-3">The register awaits its first entry</p>
+        <p class="font-mono text-xs text-ink/25 uppercase tracking-widest max-w-sm leading-relaxed">
+          Deep dives, build logs, and lessons learned will appear here as the studio produces work.
+        </p>
       </div>
     </div>
   </section>

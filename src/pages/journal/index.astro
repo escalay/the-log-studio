@@ -65,12 +65,14 @@ const jsonLd = {
               <p class="font-mono text-xs text-subtle uppercase tracking-widest">Please try again later</p>
             </div>
           ) : posts.length === 0 ? (
-            <div class="py-32 flex flex-col items-center justify-center text-center">
-              <div class="w-20 h-20 border-2 border-dashed border-subtle rounded-full flex items-center justify-center mb-6">
-                <JournalIcon className="w-8 h-8 text-subtle" />
+            <div class="py-32 flex flex-col items-center justify-center text-center px-6">
+              <div class="w-20 h-20 border-2 border-dashed border-ink/15 rounded-full flex items-center justify-center mb-8">
+                <JournalIcon className="w-8 h-8 text-ink/20" />
               </div>
-              <p class="font-serif text-2xl italic text-subtle mb-2">No dispatches yet</p>
-              <p class="font-mono text-xs text-subtle/60 uppercase tracking-widest">The register is being prepared</p>
+              <p class="font-serif text-3xl italic text-ink/40 mb-3">The register awaits its first entry</p>
+              <p class="font-mono text-xs text-ink/25 uppercase tracking-widest max-w-md leading-relaxed">
+                Quarterly deep dives, build logs, and retrospectives will be published here as the studio evolves.
+              </p>
             </div>
           ) : (
             <div class="grid md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-ink border-b border-ink">

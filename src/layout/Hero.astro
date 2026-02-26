@@ -18,15 +18,26 @@ const countByLevel = Object.fromEntries(counts.map((r) => [r.level, r.count]))
 
 const version = __APP_VERSION__
 
-const marqueeItems = [
-  `V${version}`,
-  `${totalEntries} ENTRIES`,
-  `${countByLevel[0] ?? 0} LAB NOTES`,
-  `${countByLevel[1] ?? 0} EXPERIMENTS`,
-  `${countByLevel[2] ?? 0} PROJECTS`,
-  `${countByLevel[3] ?? 0} PRODUCTS`,
-  'OPEN SOURCE',
-]
+const hasEntries = totalEntries > 0
+
+const marqueeItems = hasEntries
+  ? [
+      `V${version}`,
+      `${totalEntries} ENTRIES`,
+      countByLevel[0] ? `${countByLevel[0]} LAB NOTES` : null,
+      countByLevel[1] ? `${countByLevel[1]} EXPERIMENTS` : null,
+      countByLevel[2] ? `${countByLevel[2]} PROJECTS` : null,
+      countByLevel[3] ? `${countByLevel[3]} PRODUCTS` : null,
+      'OPEN SOURCE',
+    ].filter(Boolean) as string[]
+  : [
+      `V${version}`,
+      'OPEN SOURCE',
+      'INITIALIZING',
+      'AWAITING FIRST ENTRY',
+      'L0 → L1 → L2 → L3',
+      'IDEAS BECOME PRODUCTS',
+    ]
 
 const separator = '///'
 ---

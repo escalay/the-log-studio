@@ -18,13 +18,14 @@ export const FilterToolbar = ({ filter, setFilter, entries }: FilterToolbarProps
   }, [])
 
   const countFor = (level: MaturityLevel) => entries.filter((e) => e.level === level).length
+  const hasEntries = entries.length > 0
 
   const levels: { id: MaturityLevel | 'all'; label: string }[] = [
-    { id: 'all', label: `ALL FILES (${entries.length})` },
-    { id: MaturityLevel.L0, label: `L0: NOTES (${countFor(MaturityLevel.L0)})` },
-    { id: MaturityLevel.L1, label: `L1: PROTOS (${countFor(MaturityLevel.L1)})` },
-    { id: MaturityLevel.L2, label: `L2: PROJECTS (${countFor(MaturityLevel.L2)})` },
-    { id: MaturityLevel.L3, label: `L3: PRODUCTS (${countFor(MaturityLevel.L3)})` },
+    { id: 'all', label: hasEntries ? `ALL FILES (${entries.length})` : 'ALL FILES' },
+    { id: MaturityLevel.L0, label: hasEntries ? `L0: NOTES (${countFor(MaturityLevel.L0)})` : 'L0: NOTES' },
+    { id: MaturityLevel.L1, label: hasEntries ? `L1: PROTOS (${countFor(MaturityLevel.L1)})` : 'L1: PROTOS' },
+    { id: MaturityLevel.L2, label: hasEntries ? `L2: PROJECTS (${countFor(MaturityLevel.L2)})` : 'L2: PROJECTS' },
+    { id: MaturityLevel.L3, label: hasEntries ? `L3: PRODUCTS (${countFor(MaturityLevel.L3)})` : 'L3: PRODUCTS' },
   ]
 
   const healthColor = health === 'ok' ? 'bg-green-500' : health === 'error' ? 'bg-red-500' : 'bg-yellow-500'
