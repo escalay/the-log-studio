@@ -5,7 +5,7 @@
     {
       "binding": "DB",
       "database_name": "the-log-studio-db",
-      "database_id": "local",
+      "database_id": "def62ce5-ee84-48e1-b510-f50cadc9b839",
       "migrations_dir": "drizzle/migrations"
     }
   ]

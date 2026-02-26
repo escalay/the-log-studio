@@ -12,7 +12,8 @@
     "db:migrate:local": "wrangler d1 migrations apply the-log-studio-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply the-log-studio-db --remote",
     "db:seed:local": "curl -X POST http://localhost:4321/api/seed",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "smoke-test": "bash scripts/smoke-test.sh"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.5.0",

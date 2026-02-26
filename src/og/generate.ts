@@ -215,7 +215,7 @@ export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> 
                       letterSpacing: '0.1em',
                       color: '#888',
                     },
-                    children: 'log.escalay.app',
+                    children: 'escalay.space',
                   },
                 },
                 {

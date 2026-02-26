@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /og/
 
-Sitemap: https://log.escalay.app/sitemap-index.xml
+Sitemap: https://escalay.space/sitemap-index.xml

@@ -98,7 +98,14 @@ export const Footer = () => {
         <div className="container mx-auto grid md:grid-cols-4 border-x border-white/20">
           <div className="p-8 border-b md:border-b-0 md:border-r border-white/20">
             <div className="font-serif font-bold text-2xl mb-2">Escalay.Space</div>
-            <div className="font-mono text-[10px] text-white/50 uppercase tracking-widest">Operating System v2.0</div>
+            <a
+              href="https://github.com/escalay/the-log-studio/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-[10px] text-white/50 uppercase tracking-widest hover:text-accent transition-colors"
+            >
+              v{__APP_VERSION__}
+            </a>
           </div>
 
           <div className="p-8 border-b md:border-b-0 md:border-r border-white/20 font-mono text-xs space-y-2">
