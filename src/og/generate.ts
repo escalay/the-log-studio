@@ -1,7 +1,5 @@
-import satori from 'satori'
-import { Resvg, initWasm } from '@resvg/resvg-wasm'
-
-let wasmInitialized = false
+import satori from '@cf-wasm/satori/workerd'
+import { Resvg } from '@cf-wasm/resvg/workerd'
 
 const LEVEL_COLORS = ['#F3F4F6', '#FEF3C7', '#FFDBC1', '#D1FAE5']
 const LEVEL_LABELS = ['L0 · LAB NOTE', 'L1 · EXPERIMENT', 'L2 · PROJECT', 'L3 · PRODUCT']
@@ -27,18 +25,6 @@ const fetchFont = async (family: string, weight: number) => {
 
 export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> => {
   const { title, subtitle, level, date, type = 'default' } = options
-
-  // Initialize WASM once
-  if (!wasmInitialized) {
-    try {
-      // @ts-ignore — WASM module
-      const wasmModule = await import('@resvg/resvg-wasm/index_bg.wasm')
-      await initWasm(wasmModule.default)
-    } catch {
-      // Already initialized
-    }
-    wasmInitialized = true
-  }
 
   // Load fonts
   const [interBold, interRegular, instrumentSerif] = await Promise.all([
