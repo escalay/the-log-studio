@@ -2,6 +2,8 @@
 
 The operating system for ideas. A brutalist digital garden that tracks the evolution of experiments from raw notes to shipped products.
 
+**[escalay.space](https://escalay.space)**
+
 ## The Escalay Method
 
 Every idea enters a 4-stage maturity pipeline. Nothing skips levels — each stage earns the next through measurable validation.
@@ -19,43 +21,24 @@ The expected funnel: **100 notes → 30 experiments → 10 projects → 3 produc
 
 Read the full methodology: [`docs/operating-manual.md`](docs/operating-manual.md)
 
-## The Studio
-
-The Log Studio is the visual interface for this pipeline — an editorial, brutalist web app where each maturity level gets its own visual treatment:
-
-- **Lab Notes** — yellow sticky notes, handwritten fonts, coffee-stained paper
-- **Experiments** — graph paper, status indicators, hypothesis/results format
-- **Projects** — clean cards with git-style headers and changelog timelines
-- **Products** — dark industrial cards with KPI dashboards
-
-Also includes a block-based journal system ("The Register") and a dark-mode admin panel for managing entries.
-
 ## Stack
 
-- Vite + React 19 + TypeScript
-- Tailwind CSS (CDN, inline config in `index.html`)
-- Zod for runtime schema validation
-- localStorage for persistence (no backend)
+- Astro 5 (SSR) + React 19 islands + TypeScript
+- Cloudflare Pages + D1 (SQLite) via `@astrojs/cloudflare`
+- Drizzle ORM for schema, migrations, queries
+- Tailwind CSS with brutalist design tokens
+- Zod for API request validation
 
 ## Development
 
 ```bash
 npm install
-npm run dev       # localhost:3000
-npm run build     # production build
-npm run preview   # preview built output
+npm run dev                # Astro dev server with local D1
+npm run build              # Production build
+npm run db:generate        # Generate Drizzle migrations from schema changes
+npm run db:migrate:local   # Apply migrations to local D1
+npm run db:seed:local      # Seed local D1 with sample data
 ```
-
-Requires `GEMINI_API_KEY` in `.env.local`.
-
-## Design Tokens
-
-All defined inline in `index.html`:
-
-- **Colors**: `paper` (cream), `ink` (#111), `accent` (International Orange #FF4F00), `level-0` through `level-3`
-- **Fonts**: Inter, Instrument Serif, JetBrains Mono, Caveat, Gochi Hand, Nanum Pen Script
-- **Shadows**: `hard` (4px 4px), `hard-sm`, `hard-xl` — no rounded corners, no soft shadows
-- **Patterns**: dot-grid, lined-paper, graph-paper, hazard-stripes
 
 ## License
 
