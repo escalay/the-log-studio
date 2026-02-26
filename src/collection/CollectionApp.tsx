@@ -1,8 +1,20 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import type { Entry, FilterState } from '@/types'
 import { FilterToolbar } from './FilterToolbar'
 import { EntryCardSwitcher } from './EntryCardSwitcher'
 import { DetailModalSwitcher } from './DetailModalSwitcher'
+
+const getEntryParam = () => new URLSearchParams(window.location.search).get('entry')
+
+const setEntryParam = (entryId: string | null) => {
+  const url = new URL(window.location.href)
+  if (entryId) {
+    url.searchParams.set('entry', entryId)
+  } else {
+    url.searchParams.delete('entry')
+  }
+  window.history.pushState({}, '', url.pathname + url.search)
+}
 
 export const CollectionApp = () => {
   const [entries, setEntries] = useState<Entry[]>([])
@@ -11,6 +23,33 @@ export const CollectionApp = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  const openEntry = useCallback((entry: Entry) => {
+    setSelectedEntry(entry)
+    setEntryParam(entry.id)
+  }, [])
+
+  const closeEntry = useCallback(() => {
+    setSelectedEntry(null)
+    setEntryParam(null)
+  }, [])
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPopState = () => {
+      const id = getEntryParam()
+      if (id) {
+        const entry = entries.find((e) => e.id === id)
+        if (entry) setSelectedEntry(entry)
+        else setSelectedEntry(null)
+      } else {
+        setSelectedEntry(null)
+      }
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [entries])
+
+  // Fetch entries and deep-link to ?entry= if present
   useEffect(() => {
     fetch('/api/entries')
       .then((r) => {
@@ -20,6 +59,12 @@ export const CollectionApp = () => {
       .then((data: Entry[]) => {
         setEntries(data)
         setLoading(false)
+
+        const id = getEntryParam()
+        if (id) {
+          const entry = data.find((e) => e.id === id)
+          if (entry) setSelectedEntry(entry)
+        }
       })
       .catch(() => {
         setError(true)
@@ -57,7 +102,7 @@ export const CollectionApp = () => {
               key={entry.id}
               className={`${idx % 3 !== 2 ? 'lg:border-r' : ''} ${idx % 2 !== 1 ? 'md:border-r lg:border-r-0' : ''} border-b border-ink p-0`}
             >
-              <EntryCardSwitcher entry={entry} onClick={() => setSelectedEntry(entry)} />
+              <EntryCardSwitcher entry={entry} onClick={() => openEntry(entry)} />
             </div>
           ))}
 
@@ -73,7 +118,7 @@ export const CollectionApp = () => {
         </div>
       )}
 
-      {selectedEntry && <DetailModalSwitcher entry={selectedEntry} onClose={() => setSelectedEntry(null)} />}
+      {selectedEntry && <DetailModalSwitcher entry={selectedEntry} onClose={closeEntry} />}
     </>
   )
 }

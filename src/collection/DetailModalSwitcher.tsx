@@ -11,6 +11,14 @@ export const DetailModalSwitcher = ({ entry, onClose }: { entry: Entry; onClose:
     return () => { document.body.style.overflow = '' }
   }, [])
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [onClose])
+
   switch (entry.level) {
     case MaturityLevel.L0: return <LabNoteDetail entry={entry} onClose={onClose} />
     case MaturityLevel.L1: return <ExperimentDetail entry={entry} onClose={onClose} />

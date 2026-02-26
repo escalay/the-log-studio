@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Entry } from '@/types'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { TapeStrip, DoodleStar, PaperHoles } from '@/ui/HandwrittenEffects'
@@ -12,9 +12,16 @@ interface PageData {
   version?: string
 }
 
+// Toss: slow lift then accelerates off like releasing a page
+const TOSS_EASING = 'cubic-bezier(0.4, 0, 1, 0.5)'
+// Reveal: spring-like settle as the card underneath emerges
+const REVEAL_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)'
+const FLIP_DURATION = 420
+
 export const LabNoteDetail = ({ entry, onClose }: { entry: Entry; onClose: () => void }) => {
   const [pages, setPages] = useState<PageData[]>([])
   const [isFlipping, setIsFlipping] = useState(false)
+  const suppressTransition = useRef(false)
 
   useEffect(() => {
     const allPages: PageData[] = [
@@ -35,7 +42,9 @@ export const LabNoteDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
     e.stopPropagation()
     if (isFlipping || pages.length <= 1) return
     setIsFlipping(true)
+
     setTimeout(() => {
+      suppressTransition.current = true
       setPages((prev) => {
         const newPages = [...prev]
         const top = newPages.shift()
@@ -43,7 +52,13 @@ export const LabNoteDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
         return newPages
       })
       setIsFlipping(false)
-    }, 250)
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          suppressTransition.current = false
+        })
+      })
+    }, FLIP_DURATION)
   }
 
   if (pages.length === 0) return null
@@ -64,21 +79,43 @@ export const LabNoteDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
 
             let transform = ''
             let opacity = 1
+            let boxShadow = ''
+            let transition = 'none'
             const zIndex = 50 - index
 
             if (isTop) {
-              transform = isFlipping ? 'translate(120%, 10%) rotate(15deg)' : 'translate(0, 0) rotate(0deg)'
+              if (isFlipping) {
+                // Toss: sweeps up-right with natural arc, slight shrink for depth
+                transform = 'translate(130%, -8%) rotate(12deg) scale(0.94)'
+                boxShadow = '4px 12px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.1)'
+              } else {
+                transform = 'translate(0, 0) rotate(0deg) scale(1)'
+                boxShadow = ''
+              }
+            } else if (index === 1 && isFlipping) {
+              // Reveal: slides from stacked position toward center as the top card lifts
+              transform = 'translate(1px, 1px) rotate(-0.5deg) scale(0.995)'
+              opacity = 0.97
             } else {
               const rotation = index % 2 === 0 ? 3 : -2
               transform = `translate(${index * 4}px, ${index * 4}px) rotate(${rotation}deg) scale(${1 - index * 0.02})`
               opacity = 1 - index * 0.1
             }
 
+            // Per-card easing: toss accelerates, reveal springs
+            if (!suppressTransition.current) {
+              if (isTop) {
+                transition = `transform ${FLIP_DURATION}ms ${TOSS_EASING}, opacity ${FLIP_DURATION}ms ease, box-shadow ${FLIP_DURATION}ms ease`
+              } else if (index === 1) {
+                transition = `transform ${FLIP_DURATION}ms ${REVEAL_EASING}, opacity ${FLIP_DURATION}ms ease-out`
+              }
+            }
+
             return (
               <div
                 key={page.id}
-                className="absolute inset-0 bg-[#fdfbf7] shadow-paper rounded-sm flex flex-col overflow-hidden border border-gray-300 transition-all duration-300 ease-in-out cursor-pointer origin-bottom-left"
-                style={{ zIndex, transform, opacity }}
+                className="absolute inset-0 bg-[#fdfbf7] shadow-paper rounded-sm flex flex-col overflow-hidden border border-gray-300 cursor-pointer origin-bottom-left"
+                style={{ zIndex, transform, opacity, transition, ...(boxShadow ? { boxShadow } : {}) }}
               >
                 <div className="absolute inset-0 bg-lined-paper opacity-50 pointer-events-none" />
                 <PaperHoles />
