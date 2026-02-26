@@ -2,14 +2,40 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Navbar from '@/layout/Navbar.astro'
 import { Footer } from '@/layout/Footer'
+import { JournalIcon } from '@/ui/Icons'
 import { createDb } from '@/db'
 import { journalEntries } from '../../../drizzle/schema'
 
-const db = createDb(Astro.locals.runtime.env.DB)
-const posts = await db.select().from(journalEntries)
+let posts: any[] = []
+let dbError = false
+
+try {
+  const db = createDb(Astro.locals.runtime.env.DB)
+  posts = await db.select().from(journalEntries)
+} catch {
+  dbError = true
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'The Register',
+  description: 'Quarterly deep dives and retrospectives from the Escalay pipeline.',
+  url: new URL('/journal', Astro.site ?? Astro.url.origin).href,
+  publisher: {
+    '@type': 'Organization',
+    name: 'Escalay',
+  },
+  blogPost: posts.map((post) => ({
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.subtitle,
+    url: new URL(`/journal/${post.slug}`, Astro.site ?? Astro.url.origin).href,
+  })),
+}
 ---
 
-<BaseLayout title="The Register — Escalay">
+<BaseLayout title="The Register — Escalay" description="Quarterly deep dives and retrospectives from the Escalay pipeline." jsonLd={jsonLd}>
   <div class="min-h-screen flex flex-col font-sans text-ink bg-dot-grid relative overflow-x-hidden w-full">
     <Navbar active="journal" />
 
@@ -32,33 +58,49 @@ const posts = await db.select().from(journalEntries)
 
         <!-- Grid -->
         <div class="container mx-auto max-w-7xl border-x border-ink min-h-screen">
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-ink border-b border-ink">
-            {posts.map((post) => (
-              <a
-                href={`/journal/${post.slug}`}
-                class="group cursor-pointer bg-paper hover:bg-level-0 transition-colors duration-300 flex flex-col h-full min-h-[400px]"
-              >
-                <div class="p-6 border-b border-ink/10 flex justify-between items-start">
-                  <div class="font-mono text-[10px] uppercase border border-ink px-1.5 py-0.5 rounded-sm">{post.quarter}</div>
-                  <div class="w-2 h-2 bg-ink rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </div>
-                <div class="p-8 flex-1 flex flex-col justify-center">
-                  <h2 class="font-serif text-4xl md:text-5xl leading-[0.9] mb-6 group-hover:text-accent transition-colors">{post.title}</h2>
-                  <p class="font-sans text-subtle leading-relaxed line-clamp-3 mb-8">{post.subtitle}</p>
-                  <div class="mt-auto flex items-center gap-2 font-mono text-xs font-bold uppercase group-hover:underline decoration-accent underline-offset-4">
-                    Read Entry <span class="text-accent">{'->'}</span>
+          {dbError ? (
+            <div class="py-32 flex flex-col items-center justify-center text-center">
+              <div class="w-20 h-20 border-2 border-red-500/50 rounded-full flex items-center justify-center mb-6 text-red-500 font-bold text-3xl">!</div>
+              <p class="font-serif text-2xl italic mb-2">Unable to load the register</p>
+              <p class="font-mono text-xs text-subtle uppercase tracking-widest">Please try again later</p>
+            </div>
+          ) : posts.length === 0 ? (
+            <div class="py-32 flex flex-col items-center justify-center text-center">
+              <div class="w-20 h-20 border-2 border-dashed border-subtle rounded-full flex items-center justify-center mb-6">
+                <JournalIcon className="w-8 h-8 text-subtle" />
+              </div>
+              <p class="font-serif text-2xl italic text-subtle mb-2">No dispatches yet</p>
+              <p class="font-mono text-xs text-subtle/60 uppercase tracking-widest">The register is being prepared</p>
+            </div>
+          ) : (
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-ink border-b border-ink">
+              {posts.map((post) => (
+                <a
+                  href={`/journal/${post.slug}`}
+                  class="group cursor-pointer bg-paper hover:bg-level-0 transition-colors duration-300 flex flex-col h-full min-h-[400px]"
+                >
+                  <div class="p-6 border-b border-ink/10 flex justify-between items-start">
+                    <div class="font-mono text-[10px] uppercase border border-ink px-1.5 py-0.5 rounded-sm">{post.quarter}</div>
+                    <div class="w-2 h-2 bg-ink rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
-                </div>
-              </a>
-            ))}
+                  <div class="p-8 flex-1 flex flex-col justify-center">
+                    <h2 class="font-serif text-4xl md:text-5xl leading-[0.9] mb-6 group-hover:text-accent transition-colors">{post.title}</h2>
+                    <p class="font-sans text-subtle leading-relaxed line-clamp-3 mb-8">{post.subtitle}</p>
+                    <div class="mt-auto flex items-center gap-2 font-mono text-xs font-bold uppercase group-hover:underline decoration-accent underline-offset-4">
+                      Read Entry <span class="text-accent">{'->'}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
 
-            <div class="bg-level-0/30 flex items-center justify-center p-12 min-h-[400px]">
-              <div class="text-center opacity-40">
-                <div class="font-serif text-6xl mb-2 text-subtle italic">Q2</div>
-                <div class="font-mono text-xs uppercase tracking-widest">Coming Soon</div>
+              <div class="bg-level-0/30 flex items-center justify-center p-12 min-h-[400px]">
+                <div class="text-center opacity-40">
+                  <div class="font-serif text-6xl mb-2 text-subtle italic">Q2</div>
+                  <div class="font-mono text-xs uppercase tracking-widest">Coming Soon</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </main>

@@ -2,17 +2,32 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import Navbar from '@/layout/Navbar.astro'
 import Hero from '@/layout/Hero.astro'
+import JournalPreview from '@/layout/JournalPreview.astro'
 import { Footer } from '@/layout/Footer'
 import { CollectionApp } from '@/collection/CollectionApp'
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'The Log Studio',
+  description: 'The operating system for ideas. A brutalist digital garden tracking the evolution of experiments from raw notes to shipped products.',
+  url: 'https://log.escalay.app',
+  publisher: {
+    '@type': 'Organization',
+    name: 'Escalay',
+    url: 'https://log.escalay.app',
+  },
+}
 ---
 
-<BaseLayout>
+<BaseLayout jsonLd={jsonLd}>
   <div class="min-h-screen flex flex-col font-sans text-ink bg-dot-grid relative overflow-x-hidden w-full">
     <Navbar active="collection" />
     <Hero />
     <main id="main" class="flex-1 relative z-10 container mx-auto max-w-7xl md:border-x md:border-ink bg-paper min-h-screen">
       <CollectionApp client:load />
     </main>
+    <JournalPreview />
     <Footer client:idle />
   </div>
 </BaseLayout>
