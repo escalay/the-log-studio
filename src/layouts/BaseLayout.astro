@@ -5,15 +5,22 @@ interface Props {
   title?: string
   description?: string
   noindex?: boolean
+  ogImage?: string
+  jsonLd?: Record<string, unknown>
 }
 
 const {
   title = 'The Log Studio — Escalay',
   description = 'The operating system for ideas. A brutalist digital garden tracking the evolution of experiments from raw notes to shipped products.',
   noindex = false,
+  ogImage,
+  jsonLd,
 } = Astro.props
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
+const ogImageURL = ogImage
+  ? new URL(ogImage, Astro.site ?? Astro.url.origin).href
+  : new URL('/og/default.png', Astro.site ?? Astro.url.origin).href
 ---
 
 <!DOCTYPE html>
@@ -30,10 +37,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Escalay" />
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔶</text></svg>"
