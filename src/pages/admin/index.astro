@@ -1,0 +1,8 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { AdminApp } from '@/admin/AdminApp'
+---
+
+<BaseLayout title="Admin — Escalay Studio" noindex>
+  <AdminApp client:only="react" />
+</BaseLayout>
