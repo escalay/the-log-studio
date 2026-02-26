@@ -1,0 +1,16 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Navbar from '@/layout/Navbar.astro'
+import SystemDiagram from '@/layout/SystemDiagram.astro'
+import { Footer } from '@/layout/Footer'
+---
+
+<BaseLayout title="The Pipeline — Escalay">
+  <div class="min-h-screen flex flex-col font-sans text-ink bg-dot-grid relative overflow-x-hidden w-full">
+    <Navbar active="system" />
+    <main class="flex-1 relative z-10 container mx-auto max-w-7xl md:border-x md:border-ink bg-paper min-h-screen">
+      <SystemDiagram />
+    </main>
+    <Footer client:idle />
+  </div>
+</BaseLayout>
