@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Log Studio — Escalay</title>
+    <meta name="description" content="The operating system for ideas. A brutalist digital garden tracking the evolution of experiments from raw notes to shipped products." />
+    <meta name="theme-color" content="#FF4F00" />
+    <meta property="og:title" content="The Log Studio — Escalay" />
+    <meta property="og:description" content="Track the evolution of ideas through a 4-stage maturity pipeline. From lab notes to products." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Escalay" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The Log Studio — Escalay" />
+    <meta name="twitter:description" content="The operating system for ideas. A brutalist digital garden." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔶</text></svg>" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Caveat:wght@400;700&family=Gochi+Hand&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              serif: ['Instrument Serif', 'serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+              hand: ['Caveat', 'cursive'],
+              marker: ['Gochi Hand', 'cursive'],
+              pen: ['Nanum Pen Script', 'cursive'],
+            },
+            colors: {
+              paper: '#FDFCF8',     // Warm white/cream
+              surface: '#FFFFFF',   // Pure white for cards
+              ink: '#111111',       // Sharper black
+              subtle: '#666666',    // Muted text
+              line: '#E5E5E5',      // Light lines
+              border: '#111111',    // Hard border
+              accent: '#FF4F00',    // International Orange (Industrial)
+              'level-0': '#F3F4F6', // Cool Gray
+              'level-1': '#FEF3C7', // Warm Amber
+              'level-2': '#FFDBC1', // Soft Apricot
+              'level-3': '#D1FAE5', // Pale Emerald
+            },
+            boxShadow: {
+              'hard': '4px 4px 0px 0px #111111',
+              'hard-sm': '2px 2px 0px 0px #111111',
+              'hard-xl': '8px 8px 0px 0px #111111',
+              'paper': '1px 1px 4px rgba(0,0,0,0.1), 2px 8px 12px rgba(0,0,0,0.05)',
+            },
+            backgroundImage: {
+              'dot-grid': 'radial-gradient(#CECECE 1px, transparent 1px)',
+              'lined-paper': 'repeating-linear-gradient(transparent, transparent 27px, #94a3b8 28px)',
+              'graph-paper': 'linear-gradient(#e5e5e5 1px, transparent 1px), linear-gradient(90deg, #e5e5e5 1px, transparent 1px)',
+              'diagonal-stripes': 'repeating-linear-gradient(45deg, #FEF3C7, #FEF3C7 10px, #FDE68A 10px, #FDE68A 20px)',
+              'hazard-stripes': 'repeating-linear-gradient(45deg, #111, #111 10px, #FF4F00 10px, #FF4F00 20px)',
+              'marker-highlight': 'linear-gradient(120deg, rgba(255,255,0,0.2) 0%, rgba(255,255,0,0.6) 100%)',
+              'carbon': 'radial-gradient(circle, #222 1px, transparent 1px)',
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+              'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              'spin-slow': 'spin 12s linear infinite',
+              'marquee': 'marquee 25s linear infinite',
+              'shuffle-out': 'shuffleOut 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+              'shuffle-in': 'shuffleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+              'blink': 'blink 2s infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-100%)' },
+              },
+              shuffleOut: {
+                '0%': { transform: 'translateX(0) rotate(0deg)' },
+                '50%': { transform: 'translateX(120%) rotate(10deg)' },
+                '100%': { transform: 'translateX(0) rotate(-5deg) scale(0.95)', zIndex: '0' },
+              },
+              shuffleIn: {
+                '0%': { transform: 'scale(0.95) rotate(-5deg)' },
+                '100%': { transform: 'scale(1) rotate(0deg)' },
+              },
+              blink: {
+                 '0%, 100%': { opacity: '1' },
+                 '50%': { opacity: '0.4' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #FDFCF8;
+        color: #111111;
+        background-image: radial-gradient(#D1D1D1 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+      ::selection {
+        background: #FF4F00;
+        color: #FFFFFF;
+      }
+      
+      .handwritten-highlight {
+        background-image: linear-gradient(100deg, transparent 0%, rgba(255, 225, 0, 0.5) 5%, rgba(255, 225, 0, 0.7) 95%, transparent 100%);
+        border-radius: 4px 10px 4px 10px;
+        padding: 0 4px;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+
+      .scribble-scratch {
+        position: relative;
+        color: #888;
+      }
+      .scribble-scratch::after {
+        content: '';
+        position: absolute;
+        left: -5%;
+        right: -5%;
+        top: 45%;
+        height: 8px;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 Q 5 0, 10 10 T 20 10 T 30 10 T 40 10 T 50 10 T 60 10 T 70 10 T 80 10 T 90 10 T 100 10' stroke='black' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+        background-size: 20px 100%;
+        transform: rotate(-2deg);
+        pointer-events: none;
+      }
+      
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* --- GLOBAL SCROLLBAR --- */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #D4D4D4;
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #A3A3A3;
+      }
+      
+      /* --- TECHNICAL SCROLLBAR (INDUSTRIAL STYLE) --- */
+      .technical-scrollbar::-webkit-scrollbar {
+        width: 14px;
+        height: 14px;
+        background-color: #FAFAFA;
+        border-left: 1px solid #111;
+      }
+      
+      /* The Track: Hatched industrial pattern */
+      .technical-scrollbar::-webkit-scrollbar-track {
+        background-image: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 4px,
+          #e5e5e5 4px,
+          #e5e5e5 5px
+        );
+        background-size: 10px 10px;
+        box-shadow: inset 1px 0px 4px rgba(0,0,0,0.05);
+      }
+
+      /* The Thumb: Solid, mechanical slider block */
+      .technical-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #FF4F00; /* Accent Color */
+        border: 3px solid #111;    /* Hard Contrast Border */
+        border-radius: 0px;        /* Square edges */
+        box-shadow: inset 2px 2px 0px rgba(255,255,255,0.3);
+        min-height: 50px;
+      }
+      
+      .technical-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #111;
+        border-color: #FF4F00;
+      }
+      
+      /* Corner when both scrollbars meet */
+      .technical-scrollbar::-webkit-scrollbar-corner {
+        background: #111;
+      }
+
+      /* Firefox Support */
+      .technical-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #FF4F00 #e5e5e5;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
