@@ -29,9 +29,31 @@ const post = {
     componentName: b.componentName ?? undefined,
   })),
 }
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin)
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.title,
+  description: post.subtitle,
+  datePublished: post.createdAt,
+  dateModified: post.updatedAt,
+  url: canonicalURL.href,
+  image: new URL(`/og/journal/${post.slug}.png`, Astro.site ?? Astro.url.origin).href,
+  author: {
+    '@type': 'Organization',
+    name: 'Escalay',
+    url: 'https://log.escalay.app',
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Escalay',
+  },
+}
 ---
 
-<BaseLayout title={`${post.title} — The Register`} description={post.subtitle}>
+<BaseLayout title={`${post.title} — The Register`} description={post.subtitle} ogImage={`/og/journal/${post.slug}.png`} jsonLd={jsonLd}>
   <div class="min-h-screen flex flex-col font-sans text-ink bg-dot-grid relative overflow-x-hidden w-full">
     <Navbar active="journal" />
     <main class="flex-1 relative z-10 container mx-auto max-w-7xl md:border-x md:border-ink bg-paper">
