@@ -1,0 +1,12 @@
+{
+  "name": "the-log-studio",
+  "compatibility_date": "2025-01-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "the-log-studio-db",
+      "database_id": "local",
+      "migrations_dir": "drizzle/migrations"
+    }
+  ]
+}

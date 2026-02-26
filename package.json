@@ -1,23 +1,37 @@
 {
   "name": "the-log-studio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply the-log-studio-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply the-log-studio-db --remote",
+    "db:seed:local": "curl -X POST http://localhost:4321/api/seed",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^12.5.0",
+    "@astrojs/react": "^4.2.1",
+    "@astrojs/tailwind": "^6.0.2",
+    "astro": "^5.7.10",
+    "drizzle-orm": "^0.44.2",
+    "lucide-react": "^0.475.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "zod": "3.22.4",
-    "lucide-react": "^0.475.0"
+    "zod": "3.22.4"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "drizzle-kit": "^0.31.1",
+    "tailwindcss": "^3.4.17",
     "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "wrangler": "^4.14.0"
   }
 }
