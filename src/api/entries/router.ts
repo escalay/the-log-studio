@@ -4,19 +4,16 @@ import { adminAuth } from '../auth'
 import * as contracts from './contracts'
 import * as handlers from './handlers'
 
-const publicRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
-publicRouter.openapi(contracts.listEntries, handlers.listEntries)
-publicRouter.openapi(contracts.getEntry, handlers.getEntry)
-publicRouter.openapi(contracts.listUpdates, handlers.listUpdates)
+export const entriesRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
 
-const protectedRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
-protectedRouter.use('*', adminAuth)
-protectedRouter.openapi(contracts.createEntry, handlers.createEntry)
-protectedRouter.openapi(contracts.updateEntry, handlers.updateEntry)
-protectedRouter.openapi(contracts.deleteEntry, handlers.deleteEntry)
-protectedRouter.openapi(contracts.appendUpdate, handlers.appendUpdate)
-protectedRouter.openapi(contracts.promoteEntry, handlers.promoteEntry)
+// Public
+entriesRouter.openapi(contracts.listEntries, handlers.listEntries)
+entriesRouter.openapi(contracts.getEntry, handlers.getEntry)
+entriesRouter.openapi(contracts.listUpdates, handlers.listUpdates)
 
-export const entriesRouter = new OpenAPIHono<Env>()
-entriesRouter.route('/', publicRouter)
-entriesRouter.route('/', protectedRouter)
+// Protected — inject adminAuth via route middleware
+entriesRouter.openapi({ ...contracts.createEntry, middleware: [adminAuth] as any }, handlers.createEntry)
+entriesRouter.openapi({ ...contracts.updateEntry, middleware: [adminAuth] as any }, handlers.updateEntry)
+entriesRouter.openapi({ ...contracts.deleteEntry, middleware: [adminAuth] as any }, handlers.deleteEntry)
+entriesRouter.openapi({ ...contracts.appendUpdate, middleware: [adminAuth] as any }, handlers.appendUpdate)
+entriesRouter.openapi({ ...contracts.promoteEntry, middleware: [adminAuth] as any }, handlers.promoteEntry)

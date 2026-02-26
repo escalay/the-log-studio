@@ -4,13 +4,10 @@ import { adminAuth } from '../auth'
 import * as contracts from './contracts'
 import * as handlers from './handlers'
 
-const publicRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
-publicRouter.openapi(contracts.health, handlers.health)
+export const systemRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
 
-const protectedRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
-protectedRouter.use('*', adminAuth)
-protectedRouter.openapi(contracts.seed, handlers.seed)
+// Public
+systemRouter.openapi(contracts.health, handlers.health)
 
-export const systemRouter = new OpenAPIHono<Env>()
-systemRouter.route('/', publicRouter)
-systemRouter.route('/', protectedRouter)
+// Protected — inject adminAuth via route middleware
+systemRouter.openapi({ ...contracts.seed, middleware: [adminAuth] as any }, handlers.seed)

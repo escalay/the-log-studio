@@ -4,16 +4,13 @@ import { adminAuth } from '../auth'
 import * as contracts from './contracts'
 import * as handlers from './handlers'
 
-const publicRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
-publicRouter.openapi(contracts.listJournal, handlers.listJournal)
-publicRouter.openapi(contracts.getJournal, handlers.getJournal)
+export const journalRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
 
-const protectedRouter = new OpenAPIHono<Env>({ defaultHook: validationHook })
-protectedRouter.use('*', adminAuth)
-protectedRouter.openapi(contracts.createJournal, handlers.createJournal)
-protectedRouter.openapi(contracts.updateJournal, handlers.updateJournal)
-protectedRouter.openapi(contracts.deleteJournal, handlers.deleteJournal)
+// Public
+journalRouter.openapi(contracts.listJournal, handlers.listJournal)
+journalRouter.openapi(contracts.getJournal, handlers.getJournal)
 
-export const journalRouter = new OpenAPIHono<Env>()
-journalRouter.route('/', publicRouter)
-journalRouter.route('/', protectedRouter)
+// Protected — inject adminAuth via route middleware
+journalRouter.openapi({ ...contracts.createJournal, middleware: [adminAuth] as any }, handlers.createJournal)
+journalRouter.openapi({ ...contracts.updateJournal, middleware: [adminAuth] as any }, handlers.updateJournal)
+journalRouter.openapi({ ...contracts.deleteJournal, middleware: [adminAuth] as any }, handlers.deleteJournal)
