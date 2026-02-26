@@ -1,28 +1,6 @@
 import { defineMiddleware } from 'astro:middleware'
 
-const MUTATING_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH']
-
 export const onRequest = defineMiddleware(async ({ request, locals, url }, next) => {
-  // Protect mutating API endpoints with a shared secret
-  if (url.pathname.startsWith('/api/') && MUTATING_METHODS.includes(request.method)) {
-    const env = locals.runtime?.env
-    const adminSecret = env?.ADMIN_SECRET
-
-    // If ADMIN_SECRET is configured, enforce it
-    if (adminSecret) {
-      const headerToken = request.headers.get('x-admin-secret')
-      const cookieToken = parseCookie(request.headers.get('cookie') ?? '', 'admin_token')
-
-      // Accept either header token (CLI/external) or cookie (admin panel browser)
-      if (headerToken !== adminSecret && cookieToken !== adminSecret) {
-        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-    }
-  }
-
   // Protect admin page with token query param or cookie
   if (url.pathname.startsWith('/admin')) {
     const env = locals.runtime?.env
