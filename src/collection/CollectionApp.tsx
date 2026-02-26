@@ -82,7 +82,7 @@ export const CollectionApp = () => {
 
   return (
     <>
-      <FilterToolbar filter={filter} setFilter={setFilter} />
+      <FilterToolbar filter={filter} setFilter={setFilter} entries={entries} />
 
       {loading ? (
         <div className="py-32 flex flex-col items-center justify-center border-b border-ink">
