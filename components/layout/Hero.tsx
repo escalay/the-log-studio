@@ -1,0 +1,72 @@
+
+import React from 'react';
+import { PlayIcon } from '../Icons';
+
+export const Hero = () => {
+    return (
+        <header className="relative min-h-[50vh] bg-[#FDFCF8] border-b border-ink flex flex-col justify-between overflow-hidden">
+            {/* Background Texture */}
+            <div className="absolute inset-0 bg-dot-grid opacity-30 pointer-events-none" />
+            <div className="absolute top-0 w-full h-1 bg-hazard-stripes opacity-100 z-50" />
+            
+            <div className="container mx-auto max-w-7xl flex-1 flex flex-col justify-center px-6 md:px-12 py-12 md:py-0 relative z-10">
+                <div className="grid md:grid-cols-12 gap-12 items-end">
+                    {/* Left: Branding */}
+                    <div className="md:col-span-7 lg:col-span-8">
+                        <div className="inline-flex items-center gap-2 px-2 py-1 bg-ink text-white font-mono text-[10px] font-bold uppercase tracking-widest mb-6">
+                            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse" />
+                            System Online
+                        </div>
+                        
+                        <h1 className="text-7xl md:text-8xl lg:text-[9rem] font-serif font-bold text-ink tracking-tighter leading-[0.85] mb-6">
+                            ESCALAY<span className="text-accent">.</span>
+                        </h1>
+                        
+                        <p className="font-sans text-lg md:text-xl text-subtle max-w-xl leading-relaxed border-l-2 border-ink/10 pl-6">
+                            The operating system for ideas. Tracking the evolution from <span className="border-b border-ink/20">raw notes</span> to <span className="border-b border-ink/20">shipping products</span>.
+                        </p>
+                    </div>
+
+                    {/* Right: Directive & CTA */}
+                    <div className="md:col-span-5 lg:col-span-4 flex flex-col items-start md:items-end gap-8">
+                         {/* Static Manifesto Card */}
+                         <div className="bg-white p-6 border-l-4 border-ink shadow-sm w-full transition-transform hover:-translate-y-1 duration-300">
+                            <div className="font-mono text-[10px] text-subtle uppercase mb-2 tracking-wider border-b border-ink/10 pb-2">
+                                Primary Directive
+                            </div>
+                            <div className="font-serif italic text-2xl text-ink leading-tight">
+                                "Revenue is water.<br/>
+                                Code is overhead.<br/>
+                                <span className="text-accent font-bold not-italic bg-accent/5 px-1">Ship or die.</span>"
+                            </div>
+                         </div>
+                         
+                         <button 
+                            onClick={() => document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="group flex items-center gap-4 px-6 py-3 bg-white border border-ink font-mono text-xs font-bold uppercase tracking-widest hover:bg-ink hover:text-white transition-all shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5"
+                        >
+                            Initialize System
+                            <PlayIcon className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Bottom Ticker */}
+            <div className="border-t border-ink bg-white py-3 overflow-hidden whitespace-nowrap z-20 shrink-0">
+                 <div className="animate-marquee flex gap-12 items-center font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-ink/80">
+                    {[1,2,3,4,5].map(i => (
+                        <React.Fragment key={i}>
+                            <span>V2.0.4 STABLE</span>
+                            <span className="text-subtle opacity-30">///</span>
+                            <span>LOG STUDIO ACTIVE</span>
+                            <span className="text-subtle opacity-30">///</span>
+                            <span>OPEN SOURCE</span>
+                            <span className="text-subtle opacity-30">///</span>
+                        </React.Fragment>
+                    ))}
+                </div>
+            </div>
+        </header>
+    );
+};
