@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro'
 import { generateOGImage } from '@/og/generate'
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ url }) => {
   const png = await generateOGImage({
     title: 'The Pipeline',
     subtitle: 'Four stages from raw lab notes to shipped products. L0 → L1 → L2 → L3.',
     type: 'default',
+    origin: url.origin,
   })
 
   return new Response(png, {

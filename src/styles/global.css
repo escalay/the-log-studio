@@ -1,3 +1,61 @@
+/* ZT Bros Oskon 90s — self-hosted */
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-MediumItalic.woff2') format('woff2');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-SemiBoldItalic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ZT Bros Oskon 90s';
+  src: url('/fonts/ZTBrosOskon90s-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

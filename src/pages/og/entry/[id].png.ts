@@ -6,7 +6,7 @@ import { generateOGImage } from '@/og/generate'
 
 const LEVEL_NAMES = ['Lab Note', 'Experiment', 'Project', 'Product']
 
-export const GET: APIRoute = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params, locals, url }) => {
   const db = createDb(locals.runtime.env.DB)
   const { id } = params
 
@@ -22,6 +22,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     level: entry.level,
     date: entry.date,
     type: 'entry',
+    origin: url.origin,
   })
 
   return new Response(png, {

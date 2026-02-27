@@ -4,7 +4,7 @@ import { createDb } from '@/db'
 import { journalEntries } from '../../../../drizzle/schema'
 import { generateOGImage } from '@/og/generate'
 
-export const GET: APIRoute = async ({ params, locals }) => {
+export const GET: APIRoute = async ({ params, locals, url }) => {
   const db = createDb(locals.runtime.env.DB)
   const { slug } = params
 
@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     subtitle: post.subtitle,
     date: `${post.quarter} — ${post.date}`,
     type: 'journal',
+    origin: url.origin,
   })
 
   return new Response(png, {

@@ -13,6 +13,7 @@ interface OGOptions {
   level?: number
   date?: string
   type?: 'entry' | 'journal' | 'default'
+  origin: string
 }
 
 const fetchFont = async (family: string, weight: number) => {
@@ -24,13 +25,13 @@ const fetchFont = async (family: string, weight: number) => {
 }
 
 export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> => {
-  const { title, subtitle, level, date, type = 'default' } = options
+  const { title, subtitle, level, date, type = 'default', origin } = options
 
   // Load fonts
-  const [interBold, interRegular, instrumentSerif] = await Promise.all([
-    fetchFont('Inter', 700),
-    fetchFont('Inter', 400),
-    fetchFont('Instrument Serif', 400),
+  const [sansBold, sansRegular, serifFont] = await Promise.all([
+    fetchFont('Space Grotesk', 700),
+    fetchFont('Space Grotesk', 400),
+    fetch(`${origin}/fonts/ZTBrosOskon90s-Bold.woff2`).then((r) => r.arrayBuffer()),
   ])
 
   const isJournal = type === 'journal'
@@ -48,7 +49,7 @@ export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> 
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: PAPER,
-          fontFamily: 'Inter',
+          fontFamily: 'Space Grotesk',
           position: 'relative',
           overflow: 'hidden',
         },
@@ -154,7 +155,7 @@ export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> 
                     style: {
                       fontSize: title.length > 40 ? 48 : 64,
                       fontWeight: 700,
-                      fontFamily: 'Instrument Serif',
+                      fontFamily: 'ZT Bros Oskon 90s',
                       lineHeight: 1.0,
                       color: INK,
                       maxWidth: '900px',
@@ -217,7 +218,7 @@ export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> 
                       justifyContent: 'center',
                       fontSize: 20,
                       fontWeight: 700,
-                      fontFamily: 'Instrument Serif',
+                      fontFamily: 'ZT Bros Oskon 90s',
                     },
                     children: 'E.',
                   },
@@ -232,9 +233,9 @@ export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> 
       width: 1200,
       height: 630,
       fonts: [
-        { name: 'Inter', data: interBold, weight: 700 },
-        { name: 'Inter', data: interRegular, weight: 400 },
-        { name: 'Instrument Serif', data: instrumentSerif, weight: 400 },
+        { name: 'Space Grotesk', data: sansBold, weight: 700 },
+        { name: 'Space Grotesk', data: sansRegular, weight: 400 },
+        { name: 'ZT Bros Oskon 90s', data: serifFont, weight: 700 },
       ],
     },
   )

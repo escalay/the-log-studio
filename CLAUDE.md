@@ -89,7 +89,7 @@ Each variant has its own visual treatment (handwritten notes, graph paper, etc.)
 Tailwind configured in `tailwind.config.ts`. Key tokens:
 
 - **Colors**: `paper` (cream), `ink` (#111), `accent` (International Orange #FF4F00), `level-0` through `level-3`
-- **Fonts**: `font-sans` (Inter), `font-serif` (Instrument Serif), `font-mono` (JetBrains Mono), `font-hand` (Caveat), `font-marker` (Gochi Hand), `font-pen` (Nanum Pen Script)
+- **Fonts**: `font-sans` (Space Grotesk), `font-serif` (ZT Bros Oskon 90s, self-hosted), `font-mono` (IBM Plex Mono), `font-hand` (Caveat), `font-marker` (Gochi Hand), `font-pen` (Nanum Pen Script)
 - **Shadows**: `shadow-hard` (4px 4px 0px), `shadow-hard-sm`, `shadow-hard-xl`
 - **Backgrounds**: `bg-dot-grid`, `bg-lined-paper`, `bg-graph-paper`, `bg-hazard-stripes`
 

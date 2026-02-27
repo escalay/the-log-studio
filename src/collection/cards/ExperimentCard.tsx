@@ -33,7 +33,7 @@ export const ExperimentCard = ({ entry, onClick }: { entry: Entry; onClick: () =
           <span className="w-1.5 h-1.5 border border-accent"></span>
           Hypothesis
         </div>
-        <h3 className="font-serif text-2xl md:text-3xl leading-[0.9] mb-4 text-ink group-hover:text-accent transition-colors">
+        <h3 className="font-serif font-medium text-2xl md:text-3xl leading-[0.9] mb-4 text-ink group-hover:text-accent transition-colors">
           {entry.title}
         </h3>
         <p className="font-mono text-[10px] md:text-[11px] text-subtle leading-relaxed line-clamp-3 mb-6 bg-level-0/50 p-2 border-l-2 border-ink/10">

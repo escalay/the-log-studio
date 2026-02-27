@@ -23,7 +23,7 @@ export const ProductCard = ({ entry, onClick }: { entry: Entry; onClick: () => v
       <div className="mb-6 w-12 h-12 bg-white/5 border border-white/10 rounded-sm flex items-center justify-center text-white/20 group-hover:text-white group-hover:border-white/40 transition-all duration-300">
         <RocketIcon className="w-5 h-5" />
       </div>
-      <h3 className="font-serif text-4xl text-white leading-[0.9] mb-4 group-hover:translate-x-1 transition-transform duration-300">
+      <h3 className="font-serif font-medium text-4xl text-white leading-[0.9] mb-4 group-hover:translate-x-1 transition-transform duration-300">
         {entry.title}
       </h3>
       <p className="font-sans text-sm text-white/50 leading-relaxed line-clamp-3 group-hover:text-white/80 transition-colors">

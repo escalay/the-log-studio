@@ -14,7 +14,7 @@ export const LabNoteCard = ({ entry, onClick }: { entry: Entry; onClick: () => v
         <div className="font-mono text-[10px] text-ink border border-ink px-1 rounded-full">L0</div>
       </div>
 
-      <h3 className="font-handwriting font-serif text-3xl leading-none text-ink mb-4 group-hover:text-accent transition-colors">
+      <h3 className="font-handwriting font-serif font-medium text-3xl leading-none text-ink mb-4 group-hover:text-accent transition-colors">
         {entry.title}
       </h3>
 

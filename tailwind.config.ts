@@ -5,9 +5,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Instrument Serif', 'serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        sans: ['Space Grotesk', 'sans-serif'],
+        serif: ['"ZT Bros Oskon 90s"', 'serif'],
+        mono: ['IBM Plex Mono', 'monospace'],
         hand: ['Caveat', 'cursive'],
         marker: ['Gochi Hand', 'cursive'],
         pen: ['Nanum Pen Script', 'cursive'],
