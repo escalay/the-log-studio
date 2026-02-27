@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import type { JournalEntry, JournalBlock } from '@/types'
+import { track } from '@/lib/analytics'
 import { ArrowLeft } from '@/ui/Icons'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { BarChart, ListHighlight } from './custom/CustomComponents'
@@ -38,10 +40,44 @@ const renderBlock = (block: JournalBlock, index: number) => {
 }
 
 export const JournalPage = ({ post }: { post: JournalEntry }) => {
+  useEffect(() => {
+    track('journal_post_viewed', {
+      post_slug: post.slug,
+      post_title: post.title,
+      read_time: post.readTime,
+    })
+  }, [post.slug, post.title, post.readTime])
+
+  useEffect(() => {
+    const content = document.querySelector('.journal-content')
+    if (!content) return
+
+    const fired = new Set<number>()
+    const thresholds = [25, 50, 75, 100]
+
+    const onScroll = () => {
+      const rect = content.getBoundingClientRect()
+      const contentTop = window.scrollY + rect.top
+      const contentHeight = rect.height
+      const scrolled = window.scrollY + window.innerHeight - contentTop
+      const percent = Math.min(100, Math.max(0, (scrolled / contentHeight) * 100))
+
+      for (const t of thresholds) {
+        if (percent >= t && !fired.has(t)) {
+          fired.add(t)
+          track('journal_scroll_depth', { post_slug: post.slug, depth_percent: t })
+        }
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [post.slug])
+
   return (
     <div className="bg-paper min-h-screen">
       <div className="sticky top-14 z-40 bg-paper/95 backdrop-blur-sm border-b border-ink flex items-center justify-between px-4 md:px-8 h-12">
-        <a href="/journal" className="flex items-center gap-2 font-mono text-xs uppercase hover:text-accent transition-colors group">
+        <a href="/journal" onClick={() => track('journal_back_clicked', { post_slug: post.slug })} className="flex items-center gap-2 font-mono text-xs uppercase hover:text-accent transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Register
         </a>

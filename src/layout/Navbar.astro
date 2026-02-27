@@ -16,6 +16,8 @@ const { active = 'collection' } = Astro.props
   <div class="flex h-full">
     <a
       href="/"
+      data-track="nav_clicked"
+      data-track-destination="collection"
       class:list={[
         'px-4 md:px-6 h-full font-mono text-xs uppercase hover:bg-ink hover:text-white transition-colors flex items-center',
         { 'bg-ink text-white': active === 'collection' },
@@ -25,6 +27,8 @@ const { active = 'collection' } = Astro.props
     </a>
     <a
       href="/system"
+      data-track="nav_clicked"
+      data-track-destination="system"
       class:list={[
         'px-4 md:px-6 h-full font-mono text-xs uppercase border-l border-ink hover:bg-ink hover:text-white transition-colors flex items-center',
         { 'bg-ink text-white': active === 'system' },
@@ -34,6 +38,8 @@ const { active = 'collection' } = Astro.props
     </a>
     <a
       href="/journal"
+      data-track="nav_clicked"
+      data-track-destination="journal"
       class:list={[
         'px-4 md:px-6 h-full font-mono text-xs uppercase border-l border-ink hover:bg-ink hover:text-white transition-colors flex items-center gap-2',
         { 'bg-ink text-white': active === 'journal' },

@@ -4,6 +4,7 @@ import type { OpenAPIHono } from '@hono/zod-openapi'
 export type HonoVariables = {
   db: Database
   adminSecret: string | undefined
+  openpanelClientSecret: string | undefined
 }
 
 export type Env = { Variables: HonoVariables }

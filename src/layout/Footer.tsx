@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { track } from '@/lib/analytics'
 
 const AXIOMS = [
   'Simplicity is the ultimate sophistication.',
@@ -29,6 +30,7 @@ export const Footer = () => {
 
   const printReceipt = () => {
     const newText = AXIOMS[Math.floor(Math.random() * AXIOMS.length)]
+    track('footer_receipt_printed', { axiom_text: newText })
     const newReceipt = { id: Date.now(), text: newText }
 
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
@@ -102,6 +104,7 @@ export const Footer = () => {
               href="https://github.com/escalay/the-log-studio/releases"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => track('footer_link_clicked', { link_url: 'https://github.com/escalay/the-log-studio/releases' })}
               className="font-mono text-[10px] text-white/50 uppercase tracking-widest hover:text-accent transition-colors"
             >
               v{__APP_VERSION__}
@@ -111,7 +114,7 @@ export const Footer = () => {
           <div className="p-8 border-b md:border-b-0 md:border-r border-white/20 font-mono text-xs space-y-2">
             <div className="flex justify-between">
               <span className="text-white/50">AUTHOR</span>
-              <a href="https://abdallahaho.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">ABDALLAH OTHMAN</a>
+              <a href="https://abdallahaho.com" target="_blank" rel="noopener noreferrer" onClick={() => track('footer_link_clicked', { link_url: 'https://abdallahaho.com' })} className="hover:text-accent transition-colors">ABDALLAH OTHMAN</a>
             </div>
             <div className="flex justify-between">
               <span className="text-white/50">LOC</span>
@@ -141,7 +144,7 @@ export const Footer = () => {
           <div className="p-8 flex flex-col items-center justify-center bg-white/5 gap-2">
             <button
               className="bg-white text-ink font-mono text-xs font-bold uppercase px-6 py-3 hover:bg-accent hover:text-white transition-colors w-full"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => { track('footer_back_to_top'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
             >
               Back to Top ^
             </button>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Entry } from '@/types'
+import { track } from '@/lib/analytics'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { TerminalIcon } from '@/ui/Icons'
 
@@ -45,7 +46,7 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-level-0 relative">
           {/* META PANEL */}
           <div className={`order-2 lg:order-1 w-full lg:w-80 xl:w-96 shrink-0 bg-[#1a1a1a] text-gray-300 border-t-2 lg:border-t-0 lg:border-r-2 border-ink flex flex-col overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${isMobileMetaExpanded ? 'h-[60vh]' : 'h-14'} lg:h-full`}>
-            <div className="bg-black p-3 border-b border-white/10 flex items-center justify-between sticky top-0 z-10 cursor-pointer lg:cursor-default h-14 shrink-0" onClick={() => window.innerWidth < 1024 && setIsMobileMetaExpanded(!isMobileMetaExpanded)}>
+            <div className="bg-black p-3 border-b border-white/10 flex items-center justify-between sticky top-0 z-10 cursor-pointer lg:cursor-default h-14 shrink-0" onClick={() => { if (window.innerWidth < 1024) { const next = !isMobileMetaExpanded; track('experiment_meta_toggled', { entry_id: entry.id, expanded: next }); setIsMobileMetaExpanded(next) } }}>
               <div className="flex items-center gap-2">
                 <TerminalIcon className="w-4 h-4 text-accent" />
                 <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-white">System Telemetry</span>

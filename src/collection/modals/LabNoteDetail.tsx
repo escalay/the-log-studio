@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { Entry } from '@/types'
+import { track } from '@/lib/analytics'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { TapeStrip, DoodleStar, PaperHoles } from '@/ui/HandwrittenEffects'
 
@@ -41,6 +42,14 @@ export const LabNoteDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
   const handleFlip = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (isFlipping || pages.length <= 1) return
+
+    const nextIndex = 1 % pages.length
+    track('lab_note_flipped', {
+      entry_id: entry.id,
+      page_index: nextIndex,
+      total_pages: pages.length,
+    })
+
     setIsFlipping(true)
 
     setTimeout(() => {

@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import type { Entry, FilterState } from '@/types'
+import { track } from '@/lib/analytics'
 import { FilterToolbar } from './FilterToolbar'
 import { EntryCardSwitcher } from './EntryCardSwitcher'
 import { DetailModalSwitcher } from './DetailModalSwitcher'
@@ -24,6 +25,12 @@ export const CollectionApp = () => {
   const [error, setError] = useState(false)
 
   const openEntry = useCallback((entry: Entry) => {
+    track('entry_card_clicked', {
+      entry_id: entry.id,
+      entry_title: entry.title,
+      entry_level: entry.level,
+      entry_slug: entry.slug,
+    })
     setSelectedEntry(entry)
     setEntryParam(entry.id)
   }, [])
@@ -60,6 +67,22 @@ export const CollectionApp = () => {
         setEntries(data)
         setLoading(false)
 
+        const counts = { l0: 0, l1: 0, l2: 0, l3: 0 }
+        for (const e of data) {
+          if (e.level === 0) counts.l0++
+          else if (e.level === 1) counts.l1++
+          else if (e.level === 2) counts.l2++
+          else if (e.level === 3) counts.l3++
+        }
+        track('collection_loaded', {
+          entry_count: data.length,
+          l0_count: counts.l0,
+          l1_count: counts.l1,
+          l2_count: counts.l2,
+          l3_count: counts.l3,
+          has_deep_link: !!getEntryParam(),
+        })
+
         const id = getEntryParam()
         if (id) {
           const entry = data.find((e) => e.id === id)
@@ -67,6 +90,7 @@ export const CollectionApp = () => {
         }
       })
       .catch(() => {
+        track('collection_load_error')
         setError(true)
         setLoading(false)
       })
@@ -82,7 +106,20 @@ export const CollectionApp = () => {
 
   return (
     <>
-      <FilterToolbar filter={filter} setFilter={setFilter} entries={entries} />
+      <FilterToolbar filter={filter} setFilter={(next) => {
+        const nextFilter = typeof next === 'function' ? next(filter) : next
+        const visible = entries.filter((e) => {
+          if (nextFilter.level !== 'all' && e.level !== nextFilter.level) return false
+          if (nextFilter.tag && !e.tags.includes(nextFilter.tag)) return false
+          return true
+        }).length
+        track('filter_changed', {
+          level: String(nextFilter.level),
+          previous_level: String(filter.level),
+          visible_count: visible,
+        })
+        setFilter(nextFilter)
+      }} entries={entries} />
 
       {loading ? (
         <div className="py-32 flex flex-col items-center justify-center border-b border-ink">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Entry, MaturityLevel, UpdateLog } from '@/types'
+import { track } from '@/lib/analytics'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { MarkdownEditor } from './MarkdownEditor'
 import { Save, X, Eye, AlertTriangle, PlusCircle, Trash2, ArrowUpCircle } from 'lucide-react'
@@ -92,6 +93,12 @@ export const EntryEditor = ({ entry, onClose, onSaved }: EntryEditorProps) => {
         return
       }
 
+      track('admin_update_log_added', {
+        entry_id: formData.id,
+        log_type: newLog.type,
+        has_version: !!newLog.version,
+      })
+
       // Refresh updates
       const res = await fetch(`/api/entries/${formData.id}/updates`)
       if (!res.ok) throw new Error('Failed to fetch updates')
@@ -106,12 +113,18 @@ export const EntryEditor = ({ entry, onClose, onSaved }: EntryEditorProps) => {
   const handlePromote = async (newLevel: number) => {
     if (isNew) return
     try {
+      const fromLevel = formData.level
       const res = await fetch(`/api/entries/${formData.id}/promote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ level: newLevel }),
       })
       if (res.ok) {
+        track('admin_entry_promoted', {
+          entry_id: formData.id,
+          from_level: fromLevel,
+          to_level: newLevel,
+        })
         const updated = await res.json()
         setFormData(updated)
       }
@@ -138,6 +151,11 @@ export const EntryEditor = ({ entry, onClose, onSaved }: EntryEditorProps) => {
           setErrors([err.error?.toString() ?? 'Failed to create entry'])
           return
         }
+        track('admin_entry_created', {
+          entry_id: formData.id,
+          entry_level: formData.level,
+          entry_type: formData.type,
+        })
       } else {
         const res = await fetch(`/api/entries/${formData.id}`, {
           method: 'PUT',
@@ -149,6 +167,10 @@ export const EntryEditor = ({ entry, onClose, onSaved }: EntryEditorProps) => {
           setErrors([err.error?.toString() ?? 'Failed to update entry'])
           return
         }
+        track('admin_entry_updated', {
+          entry_id: formData.id,
+          entry_level: formData.level,
+        })
       }
 
       setIsDirty(false)

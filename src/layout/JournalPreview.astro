@@ -52,6 +52,7 @@ const others = posts.slice(1, 4)
         </div>
         <a
           href="/journal"
+          data-track="journal_archive_clicked"
           class="font-mono text-xs font-bold uppercase tracking-widest hover:text-accent transition-colors flex items-center gap-2 group"
         >
           View Full Archive
@@ -63,7 +64,7 @@ const others = posts.slice(1, 4)
 
       <div class="grid md:grid-cols-12 min-h-[500px]">
         <!-- Main Feature (Latest) -->
-        <a href={`/journal/${latest.slug}`} class="md:col-span-8 border-b md:border-b-0 md:border-r border-ink p-8 md:p-12 relative group block">
+        <a href={`/journal/${latest.slug}`} data-track="journal_preview_clicked" data-track-post_slug={latest.slug} data-track-section="featured" class="md:col-span-8 border-b md:border-b-0 md:border-r border-ink p-8 md:p-12 relative group block">
           <div class="absolute top-0 right-0 bg-ink text-white px-3 py-1 font-mono text-xs font-bold uppercase">
             Latest Issue
           </div>
@@ -110,6 +111,9 @@ const others = posts.slice(1, 4)
               {others.map((post) => (
                 <a
                   href={`/journal/${post.slug}`}
+                  data-track="journal_preview_clicked"
+                  data-track-post_slug={post.slug}
+                  data-track-section="sidebar"
                   class="block p-6 md:p-8 hover:bg-level-0 transition-colors group"
                 >
                   <div class="font-mono text-[10px] text-subtle mb-2">{post.date}</div>

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { Entry } from '@/types'
+import { track } from '@/lib/analytics'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { BookIcon, TerminalIcon, BoxIcon, BeakerIcon } from '@/ui/Icons'
 
@@ -28,6 +29,7 @@ export const ProjectDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
 
   const handleFileClick = (file: MockFile) => {
     if (file.type === 'folder') return
+    track('project_file_viewed', { entry_id: entry.id, file_name: file.name })
     setSelectedFile(file.name)
     if (window.innerWidth < 1024) setActiveTab('overview')
   }
@@ -43,7 +45,7 @@ export const ProjectDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
               <p className="font-sans text-subtle text-lg">{entry.description}</p>
             </div>
             {entry.link && (
-              <a href={entry.link} target="_blank" rel="noreferrer" className="hidden lg:block bg-ink text-white px-6 py-2 font-mono text-xs font-bold hover:bg-accent hover:border-ink border border-transparent transition-all shadow-hard-sm">VISIT DEPLOYMENT</a>
+              <a href={entry.link} target="_blank" rel="noreferrer" onClick={() => track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! })} className="hidden lg:block bg-ink text-white px-6 py-2 font-mono text-xs font-bold hover:bg-accent hover:border-ink border border-transparent transition-all shadow-hard-sm">VISIT DEPLOYMENT</a>
             )}
           </div>
           <MarkdownContent content={entry.content} />
@@ -86,7 +88,7 @@ export const ProjectDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
 
         <div className="lg:hidden flex border-b border-ink bg-white shrink-0">
           {(['overview', 'files', 'commits'] as const).map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-3 font-mono text-xs uppercase font-bold transition-colors ${activeTab === tab ? 'bg-ink text-white' : 'text-ink hover:bg-level-0'}`}>{tab}</button>
+            <button key={tab} onClick={() => { track('project_tab_changed', { entry_id: entry.id, tab }); setActiveTab(tab) }} className={`flex-1 py-3 font-mono text-xs uppercase font-bold transition-colors ${activeTab === tab ? 'bg-ink text-white' : 'text-ink hover:bg-level-0'}`}>{tab}</button>
           ))}
         </div>
 

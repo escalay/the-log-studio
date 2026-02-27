@@ -4,8 +4,9 @@ import { createDb } from '@/db'
 import { entriesRouter } from './entries/router'
 import { journalRouter } from './journal/router'
 import { systemRouter } from './system/router'
+import { openpanelRouter } from './openpanel/router'
 
-export const createApiApp = (d1: D1Database, adminSecret: string | undefined) => {
+export const createApiApp = (d1: D1Database, adminSecret: string | undefined, openpanelClientSecret: string | undefined) => {
   const app = new OpenAPIHono<Env>({ defaultHook: validationHook }).basePath('/api')
 
   app.onError((err, c) => {
@@ -17,6 +18,7 @@ export const createApiApp = (d1: D1Database, adminSecret: string | undefined) =>
   app.use('*', async (c, next) => {
     c.set('db', createDb(d1))
     c.set('adminSecret', adminSecret)
+    c.set('openpanelClientSecret', openpanelClientSecret)
     return await next()
   })
 
@@ -24,6 +26,7 @@ export const createApiApp = (d1: D1Database, adminSecret: string | undefined) =>
   app.route('/', entriesRouter)
   app.route('/', journalRouter)
   app.route('/', systemRouter)
+  app.route('/', openpanelRouter)
 
   // OpenAPI spec endpoint
   app.doc('/openapi.json', {

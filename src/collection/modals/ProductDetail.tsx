@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Entry } from '@/types'
+import { track } from '@/lib/analytics'
 import { MarkdownContent } from '@/ui/MarkdownContent'
 import { ExternalLink, GlobeIcon, UsersIcon, TrendingUpIcon, ActivityIcon, CheckCircleIcon } from '@/ui/Icons'
 
@@ -35,7 +36,7 @@ export const ProductDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
           </div>
           <div className="flex items-center gap-4">
             {entry.link && (
-              <a href={entry.link} target="_blank" rel="noreferrer" className="hidden lg:flex items-center gap-2 px-4 py-2 bg-white text-black font-mono text-xs font-bold uppercase hover:bg-accent hover:text-white transition-colors">
+              <a href={entry.link} target="_blank" rel="noreferrer" onClick={() => track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! })} className="hidden lg:flex items-center gap-2 px-4 py-2 bg-white text-black font-mono text-xs font-bold uppercase hover:bg-accent hover:text-white transition-colors">
                 Visit Site <ExternalLink className="w-3 h-3" />
               </a>
             )}
@@ -60,13 +61,13 @@ export const ProductDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
             </div>
             <div className="lg:hidden p-4 border-t border-white/10 bg-[#0a0a0a]/90 backdrop-blur-md shrink-0">
               {entry.link && (
-                <a href={entry.link} target="_blank" rel="noreferrer" className="flex items-center justify-center w-full py-4 bg-accent text-white font-mono font-bold uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(255,79,0,0.4)]">Launch Application</a>
+                <a href={entry.link} target="_blank" rel="noreferrer" onClick={() => track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! })} className="flex items-center justify-center w-full py-4 bg-accent text-white font-mono font-bold uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(255,79,0,0.4)]">Launch Application</a>
               )}
             </div>
           </div>
 
           <div className={`w-full lg:w-[450px] xl:w-[500px] bg-[#0f0f0f] border-l border-white/10 flex flex-col shrink-0 order-2 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${isMobileMetaExpanded ? 'h-[60vh]' : 'h-14'} lg:h-full border-t border-white/10 lg:border-t-0`}>
-            <div className="lg:hidden flex items-center justify-between p-4 bg-[#111] border-b border-white/10 cursor-pointer shrink-0" onClick={() => setIsMobileMetaExpanded(!isMobileMetaExpanded)}>
+            <div className="lg:hidden flex items-center justify-between p-4 bg-[#111] border-b border-white/10 cursor-pointer shrink-0" onClick={() => { const next = !isMobileMetaExpanded; track('product_meta_toggled', { entry_id: entry.id, expanded: next }); setIsMobileMetaExpanded(next) }}>
               <div className="flex items-center gap-2"><ActivityIcon className="w-4 h-4 text-accent" /><span className="font-mono text-[10px] uppercase font-bold tracking-widest text-white">Live Metrics</span></div>
               <div className="flex items-center gap-4">
                 <div className={`flex items-center gap-2 transition-opacity duration-200 ${isMobileMetaExpanded ? 'opacity-0' : 'opacity-100'}`}>

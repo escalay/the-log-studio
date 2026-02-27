@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Entry, MaturityLevel } from '@/types'
+import { track } from '@/lib/analytics'
 import { EntryList } from './EntryList'
 import { EntryEditor } from './EntryEditor'
 import { Plus, RefreshCw, ArrowLeft } from 'lucide-react'
@@ -32,6 +33,7 @@ export const AdminApp = () => {
     try {
       const res = await fetch(`/api/entries/${id}`, { method: 'DELETE' })
       if (res.ok) {
+        track('admin_entry_deleted', { entry_id: id })
         setEntries((prev) => prev.filter((e) => e.id !== id))
       }
     } catch {
@@ -45,6 +47,7 @@ export const AdminApp = () => {
     try {
       const res = await fetch('/api/seed', { method: 'POST' })
       if (res.ok) {
+        track('admin_factory_reset')
         await fetchEntries()
       }
     } catch {

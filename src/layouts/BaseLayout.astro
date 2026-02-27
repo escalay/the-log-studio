@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css'
+import { OpenPanelComponent } from '@openpanel/astro'
 
 interface Props {
   title?: string
@@ -71,6 +72,15 @@ const ogImageURL = ogImage
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Caveat:wght@400;700&family=Gochi+Hand&family=Nanum+Pen+Script&display=swap"
       rel="stylesheet"
+    />
+
+    <OpenPanelComponent
+      clientId="1a5fd16d-035f-4a09-a880-d42827c37d20"
+      apiUrl="/api/op"
+      scriptUrl="/api/op/op1.js"
+      trackScreenViews={true}
+      trackOutgoingLinks={true}
+      trackAttributes={true}
     />
   </head>
   <body>
