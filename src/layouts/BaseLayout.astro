@@ -1,6 +1,6 @@
 ---
 import '@/styles/global.css'
-import { OpenPanelComponent } from '@openpanel/astro'
+import PostHog from '@/components/posthog.astro'
 
 interface Props {
   title?: string
@@ -74,14 +74,7 @@ const ogImageURL = ogImage
       rel="stylesheet"
     />
 
-    <OpenPanelComponent
-      clientId="1a5fd16d-035f-4a09-a880-d42827c37d20"
-      apiUrl="/api/op"
-      scriptUrl="/api/op/op1.js"
-      trackScreenViews={true}
-      trackOutgoingLinks={true}
-      trackAttributes={true}
-    />
+    <PostHog />
   </head>
   <body>
     <slot />

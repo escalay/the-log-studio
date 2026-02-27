@@ -217,7 +217,7 @@
         <div class="md:col-span-5 p-8 md:p-12 border-b md:border-b-0 md:border-r border-ink">
           <div class="font-mono text-[9px] uppercase tracking-widest text-subtle mb-4">System Author</div>
           <h3 class="font-serif text-4xl md:text-5xl font-bold leading-[0.9] mb-4">
-            <a href="https://abdallahaho.com" target="_blank" rel="noopener noreferrer" data-track="system_link_clicked" data-track-link_label="author" class="hover:text-accent transition-colors">Abdallah Othman</a>
+            <a href="https://abdallahaho.com" target="_blank" rel="noopener noreferrer" onclick="window.posthog?.capture('system_link_clicked',{link_label:'author'})" class="hover:text-accent transition-colors">Abdallah Othman</a>
           </h3>
           <div class="font-sans text-subtle text-sm leading-relaxed mb-6">
             Software engineer and technical lead focused on growth engineering, TypeScript, and AI.
@@ -261,8 +261,7 @@
             href="https://abdallahaho.com/projects/escalay"
             target="_blank"
             rel="noopener noreferrer"
-            data-track="system_link_clicked"
-            data-track-link_label="read_full_story"
+            onclick="window.posthog?.capture('system_link_clicked',{link_label:'read_full_story'})"
             class="group inline-flex items-center gap-3 px-6 py-3 bg-white border border-ink font-mono text-xs font-bold uppercase tracking-widest hover:bg-ink hover:text-white transition-all shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 self-start"
           >
             Read the full story
