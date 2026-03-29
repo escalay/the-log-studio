@@ -82,7 +82,14 @@ export const ProjectDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
             </div>
             <div className="hidden lg:block font-mono text-xs bg-white border border-ink px-4 py-1 rounded-sm shadow-sm select-none">~/{entry.slug}/{selectedFile}</div>
           </div>
-          <button onClick={onClose} className="lg:hidden px-3 py-1 font-mono text-xs font-bold bg-ink text-white">CLOSE</button>
+          <div className="flex items-center gap-2">
+            {entry.link && (
+              <a href={entry.link} target="_blank" rel="noreferrer" onClick={() => track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! })} className="px-3 py-1 font-mono text-xs font-bold bg-accent text-white hover:bg-ink transition-colors flex items-center gap-1">
+                VIEW <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            )}
+            <button onClick={onClose} className="lg:hidden px-3 py-1 font-mono text-xs font-bold bg-ink text-white">CLOSE</button>
+          </div>
           <div className="hidden lg:block text-[10px] font-mono text-subtle uppercase">ReadOnly Mode</div>
         </div>
 

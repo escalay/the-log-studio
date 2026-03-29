@@ -77,9 +77,16 @@ export const LabNoteDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
       <div className="absolute inset-0 bg-ink/70 backdrop-blur-sm transition-opacity duration-500 animate-fade-in" onClick={onClose} />
 
       <div className="relative w-full h-full flex items-center justify-center pointer-events-none">
-        <button onClick={onClose} className="absolute top-4 right-4 md:top-8 md:right-12 z-[100] pointer-events-auto text-white font-hand text-2xl md:text-3xl hover:scale-110 transition-transform drop-shadow-md">
-          (close)
-        </button>
+        <div className="absolute top-4 right-4 md:top-8 md:right-12 z-[100] pointer-events-auto flex items-center gap-3">
+          {entry.link && (
+            <a href={entry.link} target="_blank" rel="noreferrer" onClick={(e) => { e.stopPropagation(); track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! }) }} className="text-white font-hand text-xl md:text-2xl hover:scale-110 transition-transform drop-shadow-md underline decoration-accent decoration-2 underline-offset-4">
+              (visit) ↗
+            </a>
+          )}
+          <button onClick={onClose} className="text-white font-hand text-2xl md:text-3xl hover:scale-110 transition-transform drop-shadow-md">
+            (close)
+          </button>
+        </div>
 
         <div className="relative w-[90vw] md:w-[600px] h-[70vh] md:h-[800px] max-h-[85dvh] perspective-1000 pointer-events-auto" onClick={handleFlip}>
           {pages.map((page, index) => {

@@ -30,6 +30,11 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
             </div>
           </div>
           <div className="flex items-center h-full">
+            {entry.link && (
+              <a href={entry.link} target="_blank" rel="noreferrer" onClick={() => track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! })} className="hidden lg:flex items-center gap-2 mr-4 px-4 py-2 bg-accent text-white font-mono text-[10px] font-bold uppercase tracking-wider hover:bg-ink transition-colors border border-accent hover:border-ink">
+                View Project <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            )}
             <div className="hidden lg:flex flex-col items-end justify-center mr-6">
               <span className="font-mono text-[9px] text-subtle uppercase tracking-widest">Clearance</span>
               <span className="font-mono text-xs font-bold text-ink">LEVEL 4</span>
@@ -136,6 +141,11 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
               </div>
             </div>
 
+            {entry.link && (
+              <a href={entry.link} target="_blank" rel="noreferrer" onClick={() => track('deployment_link_clicked', { entry_id: entry.id, entry_title: entry.title, entry_level: entry.level, link_url: entry.link! })} className="lg:hidden flex items-center justify-center gap-2 mx-6 mb-4 py-3 bg-accent text-white font-mono text-xs font-bold uppercase tracking-wider border-2 border-accent hover:bg-ink hover:border-ink transition-colors">
+                View Project <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </a>
+            )}
             <div className="border-t border-dashed border-ink/20 p-6 lg:p-12 bg-[#fafafa]">
               <div className="flex flex-col lg:flex-row justify-between items-end gap-6 opacity-60">
                 <div>
