@@ -3,6 +3,7 @@ import { journalEntries, journalBlocks } from '../../../drizzle/schema'
 import type { RouteHandler } from '@hono/zod-openapi'
 import type { Env } from '../context'
 import * as contracts from './contracts'
+import { fail } from '../errors'
 
 // GET /journal
 export const listJournal: RouteHandler<typeof contracts.listJournal, Env> = async (c) => {
@@ -59,7 +60,7 @@ export const createJournal: RouteHandler<typeof contracts.createJournal, Env> = 
     return c.json({ id, slug: data.slug }, 201)
   } catch (error) {
     console.error('[API] journal POST:', error)
-    return c.json({ error: 'Internal server error' }, 500)
+    return fail(c, 500, 'internal', 'Internal server error')
   }
 }
 
@@ -70,7 +71,7 @@ export const getJournal: RouteHandler<typeof contracts.getJournal, Env> = async 
 
   const rows = await db.select().from(journalEntries).where(eq(journalEntries.slug, slug))
   if (rows.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+    return fail(c, 404, 'not_found', 'No journal post with that slug.')
   }
 
   const blocks = await db
@@ -99,7 +100,7 @@ export const updateJournal: RouteHandler<typeof contracts.updateJournal, Env> = 
 
   const existing = await db.select().from(journalEntries).where(eq(journalEntries.slug, slug))
   if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+    return fail(c, 404, 'not_found', 'No journal post with that slug.')
   }
 
   const data = c.req.valid('json')
@@ -141,7 +142,7 @@ export const deleteJournal: RouteHandler<typeof contracts.deleteJournal, Env> = 
 
   const existing = await db.select().from(journalEntries).where(eq(journalEntries.slug, slug))
   if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+    return fail(c, 404, 'not_found', 'No journal post with that slug.')
   }
 
   await db.delete(journalEntries).where(eq(journalEntries.slug, slug))

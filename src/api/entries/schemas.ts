@@ -4,7 +4,7 @@ import { z } from '@hono/zod-openapi'
 
 export const EntryIdParamSchema = z.object({
   id: z.string().openapi({
-    description: 'Entry ID — format is `{type_prefix}-{base36_timestamp}`, e.g. `note-mm3abc`',
+    description: 'Entry ID (`{type_prefix}-{base36_timestamp}`, e.g. `note-mm3abc`) or the entry slug (e.g. `my-new-idea`)',
     example: 'note-01',
   }),
 })
@@ -19,6 +19,22 @@ export const EntryQuerySchema = z.object({
   tag: z.string().optional().openapi({
     description: 'Filter by tag (exact match, case-sensitive). Tags are stored as a JSON array on each entry.',
     example: 'devtools',
+  }),
+  q: z.string().trim().min(1).max(100).optional().openapi({
+    description: 'Case-insensitive text search over title, description, tags and content.',
+    example: 'esp32',
+  }),
+  sort: z.enum(['date', '-date', 'updated', '-updated', 'level', '-level', 'title']).optional().openapi({
+    description: 'Sort order; a leading `-` means descending. Without it entries come in stored order.',
+    example: '-date',
+  }),
+  limit: z.coerce.number().int().min(1).max(100).optional().openapi({
+    description: 'Return at most this many entries (after filtering and sorting).',
+    example: 10,
+  }),
+  fields: z.enum(['summary']).optional().openapi({
+    description: '`summary` leaves out `content` and `updates`, for listings that only need the cards.',
+    example: 'summary',
   }),
 })
 
@@ -197,5 +213,7 @@ export const ErrorSchema = z
         }),
       }),
     ]).openapi({ description: 'Error string or structured validation error' }),
+    code: z.string().optional().openapi({ description: 'Stable machine-readable error code: validation, unauthorized, forbidden, not_found, conflict, not_configured, internal', example: 'not_found' }),
+    message: z.string().optional().openapi({ description: 'What went wrong and what to change', example: 'No entry with that id or slug.' }),
   })
   .openapi('Error')

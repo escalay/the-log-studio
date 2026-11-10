@@ -14,6 +14,6 @@ export type Hook = ConstructorParameters<typeof OpenAPIHono>[0] extends infer T
 
 export const validationHook: Hook = (result, c) => {
   if (!result.success) {
-    return c.json({ error: (result.error as any).flatten() }, 400)
+    return c.json({ error: (result.error as any).flatten(), code: 'validation', message: 'The request failed validation: see error.fieldErrors.' }, 400)
   }
 }

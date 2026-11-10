@@ -21,7 +21,7 @@ export const listEntries = createRoute({
   summary: 'List all entries',
   description:
     'Returns all entries in the collection, optionally filtered by maturity level or tag. ' +
-    'Each entry includes its full update log. Tag filtering is case-sensitive and matches exact values. ' +
+    'Each entry includes its full update log unless `fields=summary` is sent. `q` searches title, description, tags and content; `sort` and `limit` shape the result. Tag filtering is case-sensitive and matches exact values. ' +
     'Level filtering maps to the Escalay pipeline: 0 = Lab Note, 1 = Experiment, 2 = Project, 3 = Product.',
   request: { query: EntryQuerySchema },
   responses: {
@@ -55,7 +55,11 @@ export const createEntry = createRoute({
       content: { 'application/json': { schema: ErrorSchema } },
     },
     401: {
-      description: 'Missing or invalid `x-admin-secret` header / `admin_token` cookie.',
+      description: 'Missing or invalid `x-admin-secret` header (or admin session cookie).',
+      content: { 'application/json': { schema: ErrorSchema } },
+    },
+    409: {
+      description: 'An entry with this slug or id already exists.',
       content: { 'application/json': { schema: ErrorSchema } },
     },
   },

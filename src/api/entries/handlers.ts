@@ -1,8 +1,25 @@
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and, or, sql } from 'drizzle-orm'
 import { entries, entryUpdates } from '../../../drizzle/schema'
 import type { RouteHandler } from '@hono/zod-openapi'
 import type { Env } from '../context'
 import * as contracts from './contracts'
+import type { Database } from '@/db'
+import { fail } from '../errors'
+
+const NO_ENTRY = 'No entry with that id or slug.'
+
+/** An entry by id or by slug; the id wins when both match. */
+const findEntry = async (db: Database, key: string) => {
+  const rows = await db.select().from(entries).where(or(eq(entries.id, key), eq(entries.slug, key)))
+  return rows.find((row) => row.id === key) ?? rows[0]
+}
+
+const SORTERS = {
+  date: (a: { date: string }, b: { date: string }) => a.date.localeCompare(b.date),
+  updated: (a: { updatedAt: string }, b: { updatedAt: string }) => a.updatedAt.localeCompare(b.updatedAt),
+  level: (a: { level: number }, b: { level: number }) => a.level - b.level,
+  title: (a: { title: string }, b: { title: string }) => a.title.localeCompare(b.title),
+} as const
 
 const formatUpdates = (rows: { date: string; version: string | null; type: string; content: string }[]) =>
   rows.map((u) => ({ date: u.date, version: u.version, type: u.type, content: u.content }))
@@ -10,7 +27,7 @@ const formatUpdates = (rows: { date: string; version: string | null; type: strin
 // GET /entries
 export const listEntries: RouteHandler<typeof contracts.listEntries, Env> = async (c) => {
   const db = c.get('db')
-  const { level, tag } = c.req.valid('query')
+  const { level, tag, q, sort, limit, fields } = c.req.valid('query')
 
   let query = db.select().from(entries).$dynamic()
 
@@ -57,6 +74,25 @@ export const listEntries: RouteHandler<typeof contracts.listEntries, Env> = asyn
     })
   }
 
+  if (q) {
+    const needle = q.toLowerCase()
+    result = result.filter((entry) =>
+      [entry.title, entry.description, entry.content, ...(Array.isArray(entry.tags) ? entry.tags : [])]
+        .some((text) => text.toLowerCase().includes(needle)))
+  }
+
+  if (sort) {
+    const descending = sort.startsWith('-')
+    const compare = SORTERS[sort.replace('-', '') as keyof typeof SORTERS]
+    result = [...result].sort((a, b) => (descending ? compare(b, a) : compare(a, b)))
+  }
+
+  if (limit) result = result.slice(0, limit)
+
+  if (fields === 'summary') {
+    return c.json(result.map(({ content: _content, updates: _updates, ...summary }) => summary) as any, 200)
+  }
+
   return c.json(result as any, 200)
 }
 
@@ -66,6 +102,11 @@ export const createEntry: RouteHandler<typeof contracts.createEntry, Env> = asyn
   const data = c.req.valid('json')
   const now = new Date().toISOString()
   const id = data.id ?? `${data.type.slice(0, 4)}-${Date.now().toString(36)}`
+
+  const taken = await db.select({ id: entries.id }).from(entries).where(or(eq(entries.slug, data.slug), eq(entries.id, id)))
+  if (taken.length > 0) {
+    return fail(c, 409, 'conflict', `An entry with the slug "${data.slug}" or the id "${id}" already exists.`)
+  }
 
   try {
     await db.insert(entries).values({
@@ -102,34 +143,32 @@ export const createEntry: RouteHandler<typeof contracts.createEntry, Env> = asyn
     return c.json({ ...created[0], updates: formatUpdates(updates) } as any, 201)
   } catch (error) {
     console.error('[API] entries POST:', error)
-    return c.json({ error: 'Internal server error' }, 500)
+    return fail(c, 500, 'internal', 'Internal server error')
   }
 }
 
 // GET /entries/:id
 export const getEntry: RouteHandler<typeof contracts.getEntry, Env> = async (c) => {
   const db = c.get('db')
-  const { id } = c.req.valid('param')
-
-  const rows = await db.select().from(entries).where(eq(entries.id, id))
-  if (rows.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+  const found = await findEntry(db, c.req.valid('param').id)
+  if (!found) {
+    return fail(c, 404, 'not_found', NO_ENTRY)
   }
+  const id = found.id
 
   const updates = await db.select().from(entryUpdates).where(eq(entryUpdates.entryId, id))
 
-  return c.json({ ...rows[0], updates: formatUpdates(updates) } as any, 200)
+  return c.json({ ...found, updates: formatUpdates(updates) } as any, 200)
 }
 
 // PUT /entries/:id
 export const updateEntry: RouteHandler<typeof contracts.updateEntry, Env> = async (c) => {
   const db = c.get('db')
-  const { id } = c.req.valid('param')
-
-  const existing = await db.select().from(entries).where(eq(entries.id, id))
-  if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+  const found = await findEntry(db, c.req.valid('param').id)
+  if (!found) {
+    return fail(c, 404, 'not_found', NO_ENTRY)
   }
+  const id = found.id
 
   const data = c.req.valid('json')
   const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() }
@@ -143,7 +182,11 @@ export const updateEntry: RouteHandler<typeof contracts.updateEntry, Env> = asyn
   if (data.content !== undefined) updates.content = data.content
   if (data.link !== undefined) updates.link = data.link
   if (data.metrics !== undefined) updates.metrics = data.metrics
-  if (data.slug !== undefined) updates.slug = data.slug
+  if (data.slug !== undefined && data.slug !== found.slug) {
+    const taken = await db.select({ id: entries.id }).from(entries).where(eq(entries.slug, data.slug))
+    if (taken.length > 0) return fail(c, 409, 'conflict', `An entry with the slug "${data.slug}" already exists.`)
+    updates.slug = data.slug
+  }
 
   await db.update(entries).set(updates).where(eq(entries.id, id))
 
@@ -156,12 +199,11 @@ export const updateEntry: RouteHandler<typeof contracts.updateEntry, Env> = asyn
 // DELETE /entries/:id
 export const deleteEntry: RouteHandler<typeof contracts.deleteEntry, Env> = async (c) => {
   const db = c.get('db')
-  const { id } = c.req.valid('param')
-
-  const existing = await db.select().from(entries).where(eq(entries.id, id))
-  if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+  const found = await findEntry(db, c.req.valid('param').id)
+  if (!found) {
+    return fail(c, 404, 'not_found', NO_ENTRY)
   }
+  const id = found.id
 
   await db.delete(entries).where(eq(entries.id, id))
   return c.json({ status: 'deleted' }, 200)
@@ -170,12 +212,11 @@ export const deleteEntry: RouteHandler<typeof contracts.deleteEntry, Env> = asyn
 // GET /entries/:id/updates
 export const listUpdates: RouteHandler<typeof contracts.listUpdates, Env> = async (c) => {
   const db = c.get('db')
-  const { id } = c.req.valid('param')
-
-  const existing = await db.select().from(entries).where(eq(entries.id, id))
-  if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+  const found = await findEntry(db, c.req.valid('param').id)
+  if (!found) {
+    return fail(c, 404, 'not_found', NO_ENTRY)
   }
+  const id = found.id
 
   const updates = await db.select().from(entryUpdates).where(eq(entryUpdates.entryId, id))
   return c.json(formatUpdates(updates) as any, 200)
@@ -184,12 +225,11 @@ export const listUpdates: RouteHandler<typeof contracts.listUpdates, Env> = asyn
 // POST /entries/:id/updates
 export const appendUpdate: RouteHandler<typeof contracts.appendUpdate, Env> = async (c) => {
   const db = c.get('db')
-  const { id } = c.req.valid('param')
-
-  const existing = await db.select().from(entries).where(eq(entries.id, id))
-  if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+  const found = await findEntry(db, c.req.valid('param').id)
+  if (!found) {
+    return fail(c, 404, 'not_found', NO_ENTRY)
   }
+  const id = found.id
 
   const data = c.req.valid('json')
   const date = data.date ?? new Date().toISOString().split('T')[0]
@@ -214,18 +254,17 @@ const LEVEL_LABELS = ['L0 Lab Note', 'L1 Experiment', 'L2 Project', 'L3 Product'
 
 export const promoteEntry: RouteHandler<typeof contracts.promoteEntry, Env> = async (c) => {
   const db = c.get('db')
-  const { id } = c.req.valid('param')
-
-  const existing = await db.select().from(entries).where(eq(entries.id, id))
-  if (existing.length === 0) {
-    return c.json({ error: 'Not found' }, 404)
+  const found = await findEntry(db, c.req.valid('param').id)
+  if (!found) {
+    return fail(c, 404, 'not_found', NO_ENTRY)
   }
+  const id = found.id
 
-  const entry = existing[0]
+  const entry = found
   const newLevel = c.req.valid('json').level
 
   if (newLevel === entry.level) {
-    return c.json({ error: 'Entry is already at this level' }, 400)
+    return fail(c, 400, 'validation', 'Entry is already at this level')
   }
 
   const now = new Date().toISOString()

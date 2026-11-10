@@ -134,5 +134,7 @@ export const ErrorSchema = z
         formErrors: z.array(z.string()).optional(),
       }),
     ]),
+    code: z.string().optional().openapi({ description: 'Stable machine-readable error code: validation, unauthorized, forbidden, not_found, conflict, not_configured, internal', example: 'not_found' }),
+    message: z.string().optional().openapi({ description: 'What went wrong and what to change', example: 'No entry with that id or slug.' }),
   })
   .openapi('JournalError')
