@@ -4,3 +4,4 @@ Disallow: /admin
 Disallow: /api/
 
 Sitemap: https://escalay.space/sitemap-index.xml
+Sitemap: https://escalay.space/sitemap-entries.xml
