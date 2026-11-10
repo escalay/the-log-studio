@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { eq } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 import { createDb } from '@/db'
 import { entries } from '../../../../drizzle/schema'
 import { generateOGImage } from '@/og/generate'
@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ params, locals, url }) => {
   const db = createDb(locals.runtime.env.DB)
   const { id } = params
 
-  const rows = await db.select().from(entries).where(eq(entries.id, id!))
+  const rows = await db.select().from(entries).where(or(eq(entries.id, id!), eq(entries.slug, id!)))
   if (rows.length === 0) {
     return new Response('Not found', { status: 404 })
   }

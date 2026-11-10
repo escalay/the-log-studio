@@ -27,12 +27,19 @@ export interface Entry {
   link?: string
   metrics?: { label: string; value: string }[]
   updates?: UpdateLog[]
+  updatedAt?: string
 }
+
+export type SortOrder = 'newest' | 'oldest' | 'updated' | 'level'
 
 export interface FilterState {
   level: MaturityLevel | 'all'
   tag: string | null
+  query: string
+  sort: SortOrder
 }
+
+export const DEFAULT_FILTER: FilterState = { level: 'all', tag: null, query: '', sort: 'newest' }
 
 export type JournalBlockType = 'markdown' | 'component' | 'image' | 'pull-quote'
 

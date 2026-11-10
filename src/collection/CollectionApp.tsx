@@ -1,26 +1,56 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react'
-import type { Entry, FilterState } from '@/types'
+import { DEFAULT_FILTER, type Entry, type FilterState } from '@/types'
 import { track } from '@/lib/analytics'
 import { FilterToolbar } from './FilterToolbar'
 import { EntryCardSwitcher } from './EntryCardSwitcher'
 import { DetailModalSwitcher } from './DetailModalSwitcher'
 
-const getEntryParam = () => new URLSearchParams(window.location.search).get('entry')
+const SITE_TITLE = 'The Log Studio — Escalay'
+const ENTRY_PATH = /^\/entries\/([^/]+)\/?$/
 
-const setEntryParam = (entryId: string | null) => {
-  const url = new URL(window.location.href)
-  if (entryId) {
-    url.searchParams.set('entry', entryId)
-  } else {
-    url.searchParams.delete('entry')
+/** The entry the address names: `/entries/<slug>`, or the older `/?entry=<id>`. */
+const entryKeyFromLocation = () =>
+  window.location.pathname.match(ENTRY_PATH)?.[1] ?? new URLSearchParams(window.location.search).get('entry')
+
+const findByKey = (entries: Entry[], key: string) => entries.find((e) => e.slug === key || e.id === key)
+
+/** Each entry has its own address and title, so it can be shared and the back button closes it. */
+const showInAddressBar = (entry: Entry | null, replace = false) => {
+  const path = entry ? `/entries/${entry.slug}` : '/'
+  if (window.location.pathname + window.location.search !== path) {
+    window.history[replace ? 'replaceState' : 'pushState']({}, '', path)
   }
-  window.history.pushState({}, '', url.pathname + url.search)
+  document.title = entry ? `${entry.title} — The Log Studio` : SITE_TITLE
 }
 
-export const CollectionApp = () => {
+const SORTERS: Record<FilterState['sort'], (a: Entry, b: Entry) => number> = {
+  newest: (a, b) => b.date.localeCompare(a.date),
+  oldest: (a, b) => a.date.localeCompare(b.date),
+  updated: (a, b) => (b.updatedAt ?? b.date).localeCompare(a.updatedAt ?? a.date),
+  level: (a, b) => b.level - a.level || b.date.localeCompare(a.date),
+}
+
+const visibleEntries = (entries: Entry[], filter: FilterState) => {
+  const needle = filter.query.trim().toLowerCase()
+  return entries
+    .filter((entry) => {
+      if (filter.level !== 'all' && entry.level !== filter.level) return false
+      if (filter.tag && !entry.tags.includes(filter.tag)) return false
+      if (needle && ![entry.title, entry.description, entry.content, ...entry.tags].some((text) => text.toLowerCase().includes(needle))) return false
+      return true
+    })
+    .sort(SORTERS[filter.sort])
+}
+
+interface CollectionAppProps {
+  /** The entry this page was served for (`/entries/<slug>`): shown open from the first paint. */
+  initialEntry?: Entry
+}
+
+export const CollectionApp = ({ initialEntry }: CollectionAppProps = {}) => {
   const [entries, setEntries] = useState<Entry[]>([])
-  const [filter, setFilter] = useState<FilterState>({ level: 'all', tag: null })
-  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null)
+  const [filter, setFilter] = useState<FilterState>(DEFAULT_FILTER)
+  const [selectedEntry, setSelectedEntry] = useState<Entry | null>(initialEntry ?? null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -32,25 +62,21 @@ export const CollectionApp = () => {
       entry_slug: entry.slug,
     })
     setSelectedEntry(entry)
-    setEntryParam(entry.id)
+    showInAddressBar(entry)
   }, [])
 
   const closeEntry = useCallback(() => {
     setSelectedEntry(null)
-    setEntryParam(null)
+    showInAddressBar(null)
   }, [])
 
   // Handle browser back/forward
   useEffect(() => {
     const onPopState = () => {
-      const id = getEntryParam()
-      if (id) {
-        const entry = entries.find((e) => e.id === id)
-        if (entry) setSelectedEntry(entry)
-        else setSelectedEntry(null)
-      } else {
-        setSelectedEntry(null)
-      }
+      const key = entryKeyFromLocation()
+      const entry = key ? findByKey(entries, key) ?? null : null
+      setSelectedEntry(entry)
+      document.title = entry ? `${entry.title} — The Log Studio` : SITE_TITLE
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
@@ -80,13 +106,14 @@ export const CollectionApp = () => {
           l1_count: counts.l1,
           l2_count: counts.l2,
           l3_count: counts.l3,
-          has_deep_link: !!getEntryParam(),
+          has_deep_link: !!entryKeyFromLocation(),
         })
 
-        const id = getEntryParam()
-        if (id) {
-          const entry = data.find((e) => e.id === id)
-          if (entry) setSelectedEntry(entry)
+        const key = entryKeyFromLocation()
+        const entry = key ? findByKey(data, key) : undefined
+        if (entry) {
+          setSelectedEntry(entry)
+          showInAddressBar(entry, true)
         }
       })
       .catch(() => {
@@ -96,28 +123,21 @@ export const CollectionApp = () => {
       })
   }, [])
 
-  const filteredEntries = useMemo(() => {
-    return entries.filter((entry) => {
-      if (filter.level !== 'all' && entry.level !== filter.level) return false
-      if (filter.tag && !entry.tags.includes(filter.tag)) return false
-      return true
-    })
-  }, [filter, entries])
+  const filteredEntries = useMemo(() => visibleEntries(entries, filter), [filter, entries])
 
   return (
     <>
       <FilterToolbar filter={filter} setFilter={(next) => {
         const nextFilter = typeof next === 'function' ? next(filter) : next
-        const visible = entries.filter((e) => {
-          if (nextFilter.level !== 'all' && e.level !== nextFilter.level) return false
-          if (nextFilter.tag && !e.tags.includes(nextFilter.tag)) return false
-          return true
-        }).length
-        track('filter_changed', {
-          level: String(nextFilter.level),
-          previous_level: String(filter.level),
-          visible_count: visible,
-        })
+        // Typing in the search box is not a filter change worth an event per keystroke
+        if (nextFilter.level !== filter.level || nextFilter.sort !== filter.sort) {
+          track('filter_changed', {
+            level: String(nextFilter.level),
+            previous_level: String(filter.level),
+            sort: nextFilter.sort,
+            visible_count: visibleEntries(entries, nextFilter).length,
+          })
+        }
         setFilter(nextFilter)
       }} entries={entries} />
 
@@ -161,7 +181,7 @@ export const CollectionApp = () => {
             <div className="col-span-full py-32 flex flex-col items-center justify-center">
               <div className="w-16 h-16 border-2 border-dashed border-subtle rounded-full flex items-center justify-center mb-4">?</div>
               <p className="font-serif text-2xl italic">No signals match this filter.</p>
-              <button onClick={() => setFilter({ level: 'all', tag: null })} className="mt-4 font-mono text-xs underline hover:text-accent">
+              <button onClick={() => setFilter(DEFAULT_FILTER)} className="mt-4 font-mono text-xs underline hover:text-accent">
                 RESET FILTER
               </button>
             </div>

@@ -1,0 +1,82 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import Navbar from '@/layout/Navbar.astro'
+import Hero from '@/layout/Hero.astro'
+import JournalPreview from '@/layout/JournalPreview.astro'
+import { Footer } from '@/layout/Footer'
+import { CollectionApp } from '@/collection/CollectionApp'
+import { createDb } from '@/db'
+import { entries, entryUpdates } from '../../../drizzle/schema'
+import { eq, or } from 'drizzle-orm'
+import type { Entry } from '@/types'
+
+const LEVEL_NAMES = ['Lab Note', 'Experiment', 'Project', 'Product']
+
+const { slug } = Astro.params
+const db = createDb(Astro.locals.runtime.env.DB)
+
+const rows = await db.select().from(entries).where(or(eq(entries.slug, slug!), eq(entries.id, slug!)))
+const row = rows.find((candidate) => candidate.slug === slug) ?? rows[0]
+if (!row) {
+  return Astro.redirect('/')
+}
+// One address per entry: an id lands on the slug
+if (row.slug !== slug) {
+  return Astro.redirect(`/entries/${row.slug}`, 301)
+}
+
+const updates = await db.select().from(entryUpdates).where(eq(entryUpdates.entryId, row.id))
+
+const entry: Entry = {
+  id: row.id,
+  slug: row.slug,
+  title: row.title,
+  description: row.description,
+  level: row.level,
+  type: row.type as Entry['type'],
+  date: row.date,
+  tags: row.tags,
+  content: row.content,
+  link: row.link ?? undefined,
+  metrics: row.metrics ?? undefined,
+  updatedAt: row.updatedAt,
+  updates: updates.map((update) => ({
+    date: update.date,
+    version: update.version ?? undefined,
+    type: update.type as NonNullable<Entry['updates']>[number]['type'],
+    content: update.content,
+  })),
+}
+
+const origin = Astro.site ?? Astro.url.origin
+const pageURL = new URL(`/entries/${entry.slug}`, origin).href
+const ogImage = `/og/entry/${entry.id}.png`
+const description = entry.description || `${LEVEL_NAMES[entry.level]} in The Log Studio.`
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: entry.title,
+  description,
+  datePublished: entry.date,
+  dateModified: row.updatedAt,
+  url: pageURL,
+  image: new URL(ogImage, origin).href,
+  keywords: entry.tags.join(', '),
+  articleSection: LEVEL_NAMES[entry.level],
+  author: { '@type': 'Person', name: 'Abdallah Othman' },
+  publisher: { '@type': 'Organization', name: 'Escalay', url: 'https://escalay.space' },
+}
+---
+
+<BaseLayout title={`${entry.title} — The Log Studio`} description={description} ogImage={ogImage} ogType="article" jsonLd={jsonLd}>
+  <div class="min-h-screen flex flex-col font-sans text-ink bg-dot-grid relative overflow-x-hidden w-full">
+    <Navbar active="collection" />
+    <Hero />
+    <main id="main" class="flex-1 relative container mx-auto max-w-7xl md:border-x md:border-ink bg-paper">
+      <CollectionApp client:load initialEntry={entry} />
+    </main>
+    <JournalPreview />
+    <Footer client:idle />
+  </div>
+</BaseLayout>

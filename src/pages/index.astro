@@ -5,6 +5,17 @@ import Hero from '@/layout/Hero.astro'
 import JournalPreview from '@/layout/JournalPreview.astro'
 import { Footer } from '@/layout/Footer'
 import { CollectionApp } from '@/collection/CollectionApp'
+import { createDb } from '@/db'
+import { entries } from '../../drizzle/schema'
+import { eq, or } from 'drizzle-orm'
+
+// Older links opened an entry with ?entry=<id>: send them to the entry's own page
+const linked = Astro.url.searchParams.get('entry')
+if (linked) {
+  const db = createDb(Astro.locals.runtime.env.DB)
+  const found = await db.select({ slug: entries.slug }).from(entries).where(or(eq(entries.id, linked), eq(entries.slug, linked)))
+  if (found[0]) return Astro.redirect(`/entries/${found[0].slug}`, 301)
+}
 
 const jsonLd = {
   '@context': 'https://schema.org',
