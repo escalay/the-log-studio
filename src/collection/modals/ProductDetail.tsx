@@ -30,7 +30,7 @@ export const ProductDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
             </div>
             <div className="hidden lg:flex items-center gap-2 border-l border-white/10 pl-6">
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 text-green-400 border border-green-500/20 text-[10px] font-mono uppercase rounded-[2px]">
-                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />Live Production
+L3 · Product
               </span>
             </div>
           </div>
@@ -68,11 +68,10 @@ export const ProductDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
 
           <div className={`w-full lg:w-[450px] xl:w-[500px] bg-[#0f0f0f] border-l border-white/10 flex flex-col shrink-0 order-2 overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${isMobileMetaExpanded ? 'h-[60vh]' : 'h-14'} lg:h-full border-t border-white/10 lg:border-t-0`}>
             <div className="lg:hidden flex items-center justify-between p-4 bg-[#111] border-b border-white/10 cursor-pointer shrink-0" onClick={() => { const next = !isMobileMetaExpanded; track('product_meta_toggled', { entry_id: entry.id, expanded: next }); setIsMobileMetaExpanded(next) }}>
-              <div className="flex items-center gap-2"><ActivityIcon className="w-4 h-4 text-accent" /><span className="font-mono text-[10px] uppercase font-bold tracking-widest text-white">Live Metrics</span></div>
+              <div className="flex items-center gap-2"><ActivityIcon className="w-4 h-4 text-accent" /><span className="font-mono text-[10px] uppercase font-bold tracking-widest text-white">Reported Metrics</span></div>
               <div className="flex items-center gap-4">
                 <div className={`flex items-center gap-2 transition-opacity duration-200 ${isMobileMetaExpanded ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></div>
-                  <span className="font-mono text-[9px] uppercase font-bold text-white/80 tracking-wider">Online</span>
+                  <span className="font-mono text-[9px] uppercase font-bold text-white/80 tracking-wider">Since {entry.date}</span>
                 </div>
                 <div className={`transform transition-transform duration-300 ${isMobileMetaExpanded ? 'rotate-180' : 'rotate-0'}`}>
                   <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="text-white/50"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -92,7 +91,7 @@ export const ProductDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
                   </div>
                 ))}
                 {(!entry.metrics || entry.metrics.length === 0) && (
-                  <div className="col-span-2 p-8 text-center text-white/30 font-mono text-xs italic">Connecting to telemetry stream...</div>
+                  <div className="col-span-2 p-8 text-center text-white/30 font-mono text-xs italic">No metrics reported yet.</div>
                 )}
               </div>
               <div className="p-8 flex-1">
@@ -131,7 +130,7 @@ export const ProductDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
           <div className="h-full flex items-center animate-marquee whitespace-nowrap">
             {[...Array(10)].map((_, i) => (
               <div key={i} className="flex items-center gap-8 mx-4 font-mono text-[10px] font-bold uppercase tracking-[0.2em]">
-                <span>System Optimal</span><span>///</span><span>Revenue: Tracking</span><span>///</span><span>Uptime: 99.99%</span><span>///</span>
+                <span>{entry.title}</span><span>///</span><span>L3 Product</span><span>///</span><span>Since {entry.date}</span><span>///</span>
               </div>
             ))}
           </div>

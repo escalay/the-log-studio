@@ -15,7 +15,7 @@ export const ProductCard = ({ entry, onClick }: { entry: Entry; onClick: () => v
         <span className="font-mono text-xs text-white font-bold tracking-wider">{entry.slug.toUpperCase()}</span>
       </div>
       <div className="bg-white/10 text-white/60 px-2 py-1 rounded-[1px] font-mono text-[9px] uppercase tracking-wider group-hover:bg-accent group-hover:text-white transition-colors">
-        L3.Stable
+        L3.Product
       </div>
     </div>
 

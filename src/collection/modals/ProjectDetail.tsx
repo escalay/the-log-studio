@@ -21,10 +21,6 @@ export const ProjectDetail = ({ entry, onClose }: { entry: Entry; onClose: () =>
 
   const files: MockFile[] = useMemo(() => [
     { name: 'README.md', type: 'file', icon: <BookIcon className="w-3 h-3 text-accent" />, language: 'markdown' },
-    { name: 'package.json', type: 'file', icon: <TerminalIcon className="w-3 h-3 text-subtle" />, language: 'json', content: JSON.stringify({ name: entry.slug, version: entry.updates?.[entry.updates.length - 1]?.version || '0.1.0', description: entry.description, scripts: { start: 'node dist/index.js', dev: 'nodemon src/index.ts', test: 'jest' }, dependencies: Object.fromEntries(entry.tags.map((t) => [t, 'latest'])), license: 'MIT' }, null, 2) },
-    { name: 'src', type: 'folder', icon: <BoxIcon className="w-3 h-3 text-subtle" /> },
-    { name: 'src/index.ts', type: 'file', icon: <BeakerIcon className="w-3 h-3 text-subtle" />, language: 'typescript', content: `import { ${entry.title.replace(/\s/g, '')} } from './core';\n\nconst app = new ${entry.title.replace(/\s/g, '')}({\n  env: process.env.NODE_ENV,\n  debug: true\n});\n\napp.start().then(() => {\n  console.log("System Online");\n});` },
-    { name: 'tests', type: 'folder', icon: <div className="w-3 h-3 border border-ink rounded-[1px]" /> },
   ], [entry])
 
   const handleFileClick = (file: MockFile) => {

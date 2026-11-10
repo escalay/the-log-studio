@@ -17,11 +17,7 @@ export const ExperimentCard = ({ entry, onClick }: { entry: Entry; onClick: () =
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <span className="font-mono text-[9px] uppercase text-subtle/80 tracking-tight hidden sm:inline-block">Status:</span>
-        <div className="relative flex items-center justify-center w-3 h-3">
-          <div className="absolute w-2 h-2 bg-accent rounded-full animate-blink opacity-80" />
-          <div className="absolute w-2 h-2 bg-accent rounded-full animate-ping opacity-20" />
-        </div>
+        <span className="font-mono text-[9px] uppercase text-subtle/80 tracking-tight">{entry.date}</span>
       </div>
     </div>
 
@@ -36,9 +32,9 @@ export const ExperimentCard = ({ entry, onClick }: { entry: Entry; onClick: () =
         <h3 className="font-serif font-medium text-2xl md:text-3xl leading-[0.9] mb-4 text-ink group-hover:text-accent transition-colors">
           {entry.title}
         </h3>
-        <p className="font-mono text-[10px] md:text-[11px] text-subtle leading-relaxed line-clamp-3 mb-6 bg-level-0/50 p-2 border-l-2 border-ink/10">
-          {entry.description}
-        </p>
+        <div className="mb-6 bg-level-0/50 p-2 border-l-2 border-ink/10">
+          <p className="font-mono text-[10px] md:text-[11px] text-subtle leading-relaxed line-clamp-3">{entry.description}</p>
+        </div>
       </div>
 
       <div className="mt-auto grid grid-cols-2 gap-px bg-ink/10 border border-ink/10">
@@ -50,7 +46,7 @@ export const ExperimentCard = ({ entry, onClick }: { entry: Entry; onClick: () =
         ))}
         {(!entry.metrics || entry.metrics.length === 0) && (
           <div className="col-span-2 bg-white p-2 font-mono text-[9px] text-subtle italic flex items-center justify-center">
-            NO TELEMETRY DATA
+            NO METRICS YET
           </div>
         )}
       </div>
@@ -61,7 +57,7 @@ export const ExperimentCard = ({ entry, onClick }: { entry: Entry; onClick: () =
       <div className="relative z-10 flex items-center gap-2 truncate max-w-[80%]">
         <BeakerIcon className="w-3 h-3 text-accent" />
         <span className="opacity-80 group-hover:opacity-100 transition-opacity">
-          {entry.updates && entry.updates.length > 0 ? entry.updates[entry.updates.length - 1].content : 'SYSTEM INITIALIZED'}
+          {entry.updates && entry.updates.length > 0 ? entry.updates[entry.updates.length - 1].content : 'No updates yet'}
         </span>
       </div>
       <div className="relative z-10 w-2 h-2 border border-white/40 bg-transparent group-hover:bg-accent transition-colors" />

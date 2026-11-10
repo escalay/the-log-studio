@@ -6,6 +6,8 @@ import { TerminalIcon } from '@/ui/Icons'
 
 export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: () => void }) => {
   const [isMobileMetaExpanded, setIsMobileMetaExpanded] = useState(false)
+  const updateCount = entry.updates?.length ?? 0
+  const lastUpdate = entry.updates?.[updateCount - 1]?.date ?? entry.date
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-0 lg:p-6 xl:p-12 overflow-hidden">
@@ -18,13 +20,12 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
             <div className="h-full w-4 lg:w-8 bg-hazard-stripes border-r-2 border-ink" />
             <div className="px-4 lg:px-6 flex flex-col justify-center">
               <div className="flex items-center gap-2">
-                <div className="font-mono text-[9px] uppercase text-subtle tracking-[0.2em] font-bold">Confidential</div>
-                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-blink" />
+                <div className="font-mono text-[9px] uppercase text-subtle tracking-[0.2em] font-bold">L1 · Experiment</div>
               </div>
               <h1 className="font-mono text-lg lg:text-2xl font-black tracking-tighter text-ink flex items-center gap-2 mt-0.5">
-                {entry.id.toUpperCase()}
+                {entry.slug.toUpperCase()}
                 <span className="hidden lg:flex h-5 items-center px-1.5 bg-ink text-white text-[9px] rounded-[1px] font-normal ml-2 tracking-normal">
-                  REV {entry.updates?.length || 1}.0
+                  {updateCount} {updateCount === 1 ? 'UPDATE' : 'UPDATES'}
                 </span>
               </h1>
             </div>
@@ -36,8 +37,8 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
               </a>
             )}
             <div className="hidden lg:flex flex-col items-end justify-center mr-6">
-              <span className="font-mono text-[9px] text-subtle uppercase tracking-widest">Clearance</span>
-              <span className="font-mono text-xs font-bold text-ink">LEVEL 4</span>
+              <span className="font-mono text-[9px] text-subtle uppercase tracking-widest">Started</span>
+              <span className="font-mono text-xs font-bold text-ink">{entry.date}</span>
             </div>
             <button onClick={onClose} className="h-full px-6 lg:px-8 bg-ink text-white hover:bg-accent hover:text-white transition-colors flex items-center justify-center gap-2 border-l-2 border-ink group relative overflow-hidden">
               <span className="relative z-10 font-mono text-xs lg:text-sm font-bold uppercase tracking-wider group-hover:scale-105 transition-transform">Close</span>
@@ -54,12 +55,11 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
             <div className="bg-black p-3 border-b border-white/10 flex items-center justify-between sticky top-0 z-10 cursor-pointer lg:cursor-default h-14 shrink-0" onClick={() => { if (window.innerWidth < 1024) { const next = !isMobileMetaExpanded; track('experiment_meta_toggled', { entry_id: entry.id, expanded: next }); setIsMobileMetaExpanded(next) } }}>
               <div className="flex items-center gap-2">
                 <TerminalIcon className="w-4 h-4 text-accent" />
-                <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-white">System Telemetry</span>
+                <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-white">Entry Data</span>
               </div>
               <div className="lg:hidden flex items-center gap-4">
                 <div className={`flex items-center gap-2 transition-opacity duration-200 ${isMobileMetaExpanded ? 'opacity-0' : 'opacity-100'}`}>
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]"></div>
-                  <span className="font-mono text-[9px] uppercase font-bold text-white/80 tracking-wider">Operational</span>
+                  <span className="font-mono text-[9px] uppercase font-bold text-white/80 tracking-wider">Updated {lastUpdate}</span>
                 </div>
                 <div className={`transform transition-transform duration-300 ${isMobileMetaExpanded ? 'rotate-180' : 'rotate-0'}`}>
                   <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className="text-white/50"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -70,19 +70,18 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
             <div className={`flex-1 overflow-y-auto technical-scrollbar p-6 lg:p-8 space-y-8 transition-opacity duration-300 ${isMobileMetaExpanded ? 'opacity-100' : 'opacity-0 lg:opacity-100'}`}>
               <div className="bg-white/5 border border-white/10 p-4 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-1"><div className="flex gap-1"><div className="w-1 h-1 bg-white/20 rounded-full" /><div className="w-1 h-1 bg-white/20 rounded-full" /></div></div>
-                <div className="font-mono text-[9px] uppercase text-white/40 mb-2 tracking-wider">Run Status</div>
+                <div className="font-mono text-[9px] uppercase text-white/40 mb-2 tracking-wider">Started</div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xl font-bold text-white tracking-tight">OPERATIONAL</span>
-                  <div className="w-3 h-3 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)] rounded-full animate-pulse" />
+                  <span className="font-mono text-xl font-bold text-white tracking-tight">{entry.date}</span>
                 </div>
                 <div className="mt-4 pt-3 border-t border-white/10 flex justify-between font-mono text-[10px]">
-                  <span className="text-white/40">UPTIME</span>
-                  <span className="text-accent">14:02:59</span>
+                  <span className="text-white/40">LAST UPDATE</span>
+                  <span className="text-accent">{lastUpdate}</span>
                 </div>
               </div>
 
               <div>
-                <h4 className="font-mono text-[9px] uppercase text-white/40 tracking-widest mb-3 font-bold border-l-2 border-accent pl-2">Performance Data</h4>
+                <h4 className="font-mono text-[9px] uppercase text-white/40 tracking-widest mb-3 font-bold border-l-2 border-accent pl-2">Reported Metrics</h4>
                 <div className="grid grid-cols-1 gap-3">
                   {entry.metrics?.map((m, i) => (
                     <div key={i} className="bg-black border border-white/20 p-3 flex justify-between items-center group hover:border-accent transition-colors">
@@ -91,7 +90,7 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
                     </div>
                   ))}
                   {(!entry.metrics || entry.metrics.length === 0) && (
-                    <div className="font-mono text-[10px] text-white/30 italic py-2">No sensors connected.</div>
+                    <div className="font-mono text-[10px] text-white/30 italic py-2">No metrics reported yet.</div>
                   )}
                 </div>
               </div>
@@ -148,15 +147,10 @@ export const ExperimentDetail = ({ entry, onClose }: { entry: Entry; onClose: ()
             )}
             <div className="border-t border-dashed border-ink/20 p-6 lg:p-12 bg-[#fafafa]">
               <div className="flex flex-col lg:flex-row justify-between items-end gap-6 opacity-60">
-                <div>
-                  <div className="w-48 h-12 border-b border-ink mb-2 relative">
-                    <div className="absolute bottom-2 left-4 font-hand text-3xl text-blue-900 -rotate-6 mix-blend-multiply opacity-80">Approved</div>
-                  </div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest">Supervisor Signature</div>
-                </div>
+                <div className="font-mono text-[9px] uppercase tracking-widest">End of report</div>
                 <div className="font-mono text-[9px] text-right">
                   REF: {entry.slug.toUpperCase()}<br />
-                  GEN: {new Date().getFullYear()}
+                  STARTED: {entry.date}
                 </div>
               </div>
             </div>
