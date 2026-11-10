@@ -31,7 +31,7 @@ export const generateOGImage = async (options: OGOptions): Promise<ArrayBuffer> 
   const [sansBold, sansRegular, serifFont] = await Promise.all([
     fetchFont('Space Grotesk', 700),
     fetchFont('Space Grotesk', 400),
-    fetch(`${origin}/fonts/ZTBrosOskon90s-Bold.woff2`).then((r) => r.arrayBuffer()),
+    fetch(`${origin}/fonts/ZTBrosOskon90s-Bold.woff`).then((r) => r.arrayBuffer()),
   ])
 
   const isJournal = type === 'journal'
