@@ -163,6 +163,11 @@ export const CollectionApp = ({ initialEntry }: CollectionAppProps = {}) => {
             </div>
           ))}
 
+          {/* A short last row is closed with quiet cells, not left blank */}
+          {Array.from({ length: (3 - (filteredEntries.length % 3)) % 3 }, (_, filler) => (
+            <div key={`filler-${filler}`} aria-hidden="true" className={`hidden lg:block border-b border-ink bg-dot-grid opacity-60 ${filler === 0 && (3 - (filteredEntries.length % 3)) % 3 === 2 ? 'lg:border-r' : ''}`} />
+          ))}
+
           {filteredEntries.length === 0 && entries.length === 0 && (
             <div className="col-span-full py-24 flex flex-col items-center justify-center">
               <div className="w-20 h-20 border-2 border-dashed border-ink/15 rounded-full flex items-center justify-center mb-8">

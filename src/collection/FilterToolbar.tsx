@@ -41,7 +41,7 @@ export const FilterToolbar = ({ filter, setFilter, entries }: FilterToolbarProps
   return (
     <div className="border-b border-ink bg-paper p-4 md:px-8 flex flex-col md:flex-row gap-4 justify-between items-center sticky top-14 z-40">
       <div className="flex gap-2 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0">
-        {levels.map((l) => (
+        {levels.filter((l) => l.id === 'all' || !hasEntries || countFor(l.id) > 0 || filter.level === l.id).map((l) => (
           <button
             key={String(l.id)}
             onClick={() => setFilter({ ...filter, level: l.id })}
