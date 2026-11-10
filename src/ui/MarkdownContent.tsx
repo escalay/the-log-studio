@@ -1,6 +1,9 @@
 const parseLine = (text: string, handwritten: boolean) => {
-  const parts = text.split(/(\*\*.*?\*\*|~~.*?~~)/g)
+  const parts = text.split(/(`[^`]+`|\*\*.*?\*\*|~~.*?~~)/g)
   return parts.map((part, j) => {
+    if (part.length > 2 && part.startsWith('`') && part.endsWith('`')) {
+      return <code key={j} className="font-mono text-[0.9em] px-1 py-0.5 bg-[rgba(127,127,127,0.16)] rounded-[2px] break-words">{part.slice(1, -1)}</code>
+    }
     if (part.startsWith('**') && part.endsWith('**')) {
       const content = part.slice(2, -2)
       return <strong key={j} className={handwritten ? 'handwritten-highlight text-ink font-normal' : 'font-bold bg-yellow-100 px-1 rounded-sm text-ink'}>{content}</strong>
