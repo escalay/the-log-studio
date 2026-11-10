@@ -4,6 +4,7 @@ import { SEED_ENTRIES, SEED_JOURNAL_ENTRIES } from '../../../drizzle/seed'
 import type { RouteHandler } from '@hono/zod-openapi'
 import type { Env } from '../context'
 import * as contracts from './contracts'
+import { fail } from '../errors'
 
 // GET /health
 export const health: RouteHandler<typeof contracts.health, Env> = async (c) => {
@@ -22,6 +23,14 @@ export const health: RouteHandler<typeof contracts.health, Env> = async (c) => {
 export const seed: RouteHandler<typeof contracts.seed, Env> = async (c) => {
   const db = c.get('db')
   const now = new Date().toISOString()
+
+  // Seeding wipes everything: outside local dev it only runs on a database that holds nothing yet
+  if (!import.meta.env.DEV) {
+    const existing = await db.select({ id: entries.id }).from(entries).limit(1)
+    if (existing.length > 0) {
+      return fail(c, 403, 'forbidden', 'Seeding is refused: this database already holds entries, and seeding would erase them.') as any
+    }
+  }
 
   try {
     await db.delete(journalBlocks)

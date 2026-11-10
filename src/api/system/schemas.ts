@@ -41,5 +41,7 @@ export const SeedResponseSchema = z
 export const ErrorSchema = z
   .object({
     error: z.string().openapi({ example: 'Unauthorized' }),
+    code: z.string().optional().openapi({ description: 'Stable machine-readable error code: validation, unauthorized, forbidden, not_found, conflict, not_configured, internal', example: 'not_found' }),
+    message: z.string().optional().openapi({ description: 'What went wrong and what to change', example: 'No entry with that id or slug.' }),
   })
   .openapi('SystemError')

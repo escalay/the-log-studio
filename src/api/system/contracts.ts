@@ -32,7 +32,7 @@ export const seed = createRoute({
   description:
     'Destructively clears all data (journal blocks, journal entries, entry updates, entries) and re-inserts ' +
     'the built-in seed dataset. This includes 9 sample entries across all 4 maturity levels and 2 journal posts ' +
-    'with block content. Intended for development and demo environments only. **This action cannot be undone.**',
+    'with block content. Outside local development it is refused with 403 unless the database holds no entries yet. **This action cannot be undone.**',
   security: [{ adminSecret: [] }],
   responses: {
     200: {
@@ -41,6 +41,10 @@ export const seed = createRoute({
     },
     401: {
       description: 'Missing or invalid admin credentials.',
+      content: { 'application/json': { schema: ErrorSchema } },
+    },
+    403: {
+      description: 'Refused: the database already holds entries.',
       content: { 'application/json': { schema: ErrorSchema } },
     },
     500: {
