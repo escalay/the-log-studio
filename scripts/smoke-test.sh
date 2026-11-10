@@ -57,4 +57,11 @@ for attempt in $(seq 1 "$MAX_RETRIES"); do
 done
 
 echo ""
+check "/og/default.png" "Share image"
+check "/rss.xml" "Feed"
+check "/sitemap-entries.xml" "Entry sitemap"
+check "/llms.txt" "Guide"
+check "/api/entries?fields=summary&limit=1" "Entries API"
+
+echo ""
 echo "=== All smoke tests passed ==="

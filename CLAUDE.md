@@ -50,22 +50,31 @@ All data lives in Cloudflare D1. Components fetch from REST API endpoints (`/api
 
 | Route | Methods | Purpose |
 |-------|---------|---------|
-| `/api/entries` | GET, POST | List/filter entries, create entry |
-| `/api/entries/[id]` | GET, PUT, DELETE | Single entry CRUD |
+| `/api/entries` | GET, POST | List entries (`level`, `tag`, `q`, `sort`, `limit`, `fields=summary`), create entry |
+| `/api/entries/[id]` | GET, PUT, DELETE | Single entry CRUD; `[id]` is the id or the slug everywhere |
 | `/api/entries/[id]/updates` | GET, POST | List/append update logs |
 | `/api/entries/[id]/promote` | POST | Change maturity level |
 | `/api/journal` | GET, POST | List/create journal posts |
 | `/api/journal/[slug]` | GET, PUT, DELETE | Single journal post CRUD |
 | `/api/health` | GET | DB connectivity check |
-| `/api/seed` | POST | Reset + seed database |
+| `/api/seed` | POST | Reset + seed database (refused outside local dev unless the database is empty) |
+
+API rules (`src/api/`):
+
+- Every error goes through `fail()` in `errors.ts`: `{ error, code, message }`. `error` stays for older clients; branch on `code`.
+- Writes need the `x-admin-secret` header or the admin session cookie (`auth.ts`). With no `ADMIN_SECRET`, writes are refused (503) everywhere except `astro dev`.
+- GETs of entries and journal carry a weak `ETag` and `Cache-Control: max-age=0, must-revalidate` (`index.ts`): a write is visible on the next read, an unchanged read is a 304. Do not add `max-age`.
+- The API client used for content (`escalay-log` skill) reads `error`, `fieldErrors` and status codes: keep them.
 
 ### Page Routing
 
-- `/` — Collection grid (React island: `CollectionApp`)
+- `/` — Collection grid (React island: `CollectionApp`); an old `/?entry=<id>` link redirects to the entry's page
+- `/entries/[slug]` — The same grid with that entry open, server-rendered with its own title, description and share image. Opening and closing a card moves between `/` and `/entries/<slug>` with `pushState`
+- `/rss.xml`, `/sitemap-entries.xml`, `/llms.txt` — Feed, the sitemap of database-backed pages, and the plain-text API guide
 - `/system` — System diagram (static Astro)
 - `/journal` — Journal index (SSR from D1)
 - `/journal/[slug]` — Journal post (SSR from D1)
-- `/admin` — Admin panel (React island: `AdminApp`, client:only)
+- `/admin` — Admin panel (React island: `AdminApp`, client:only). `src/middleware.ts` shows a sign-in form until `POST /admin/login` sets the session cookie (a digest of the secret, `Path=/` so the panel's API calls carry it)
 
 ### Component Switcher Pattern
 
@@ -94,6 +103,10 @@ Tailwind configured in `tailwind.config.ts`. Key tokens:
 - **Backgrounds**: `bg-dot-grid`, `bg-lined-paper`, `bg-graph-paper`, `bg-hazard-stripes`
 
 All styling is Tailwind-first in className attributes. Brutalist aesthetic: hard shadows, square corners, industrial orange, hard black borders.
+
+## Share images
+
+`src/og/generate.ts` renders them with satori, which reads TTF, OTF and WOFF but **not WOFF2**: the serif is loaded from `public/fonts/ZTBrosOskon90s-Bold.woff`. `astro dev` cannot run the WASM renderer (500 locally is expected); the deploy smoke test checks `/og/default.png`.
 
 ## Database
 
